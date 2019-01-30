@@ -65,7 +65,6 @@ ganglia_web() {
 
 }
 
-
 slurm_configuration() {
 
     echo "############ START create a slurm_configuration"
@@ -97,8 +96,6 @@ slurm_configuration() {
     for i in `seq 1 $NBNODE`
     do
 	exec_on_node ${NODENAME}${i} "systemctl enable slurmctld"
-	exec_on_node ${NODENAME}${i} "systemctl enable munge"
-	exec_on_node ${NODENAME}${i} "systemctl start munge"
 	exec_on_node ${NODENAME}${i} "systemctl start slurmctld"
     done
 
@@ -107,6 +104,18 @@ slurm_configuration() {
 
 }
 
+munge_key() {
+echo "############ START munge_key"
+    scp ${NODENAME}1:/etc/munge/munge.key .
+    for i in `seq 2 $NBNODE`
+    do
+        scp_on_node munge.key "${NODENAME}${i}:/etc/munge/munge.key"
+	exec_on_node ${NODENAME}${i} "chown munge.munge /etc/munge/munge.key"
+	exec_on_node ${NODENAME}${i} "systemctl enable munge"
+	exec_on_node ${NODENAME}${i} "systemctl restart munge"
+    done
+    rm -vf munge.key
+}
 
 scp_nodes_list() {
     echo "############ START scp_nodes_list"
@@ -140,6 +149,9 @@ case "$1" in
     sshkeynode)
 	copy_ssh_key_on_nodes
 	;;
+    munge)
+	munge_key
+	;;
     slurm)
 	slurm_configuration
 	;;
@@ -150,14 +162,15 @@ case "$1" in
     scp_nodes_list
     ;;
     all)
-	fix_hostname
+    fix_hostname
     scp_nodes_list
-    slurm
-    ganglia
+    munge_key
+    slurm_configuration
+    ganglia_web
 	;;
     *)
         echo "
-     Usage: $0 {hostname|nodeslist|ganglia|sshkeynode|slurm|all} [force]
+     Usage: $0 {hostname|nodeslist|ganglia|sshkeynode|slurm|munge|all} [force]
 
  status
     Check that the cluster is not running before config
@@ -167,6 +180,9 @@ case "$1" in
 
  slurm
     configure slurm on all nodes (and enable and start the service)
+
+ munge
+    copy munger.key from ${NODENAME}1 to all other nodes
 
  ganglia
     configure apache and get ganglia up
