@@ -54,7 +54,7 @@ ganglia_web() {
     exec_on_node  ${NODENAME}1 "systemctl enable apache2"
     exec_on_node  ${NODENAME}1 "systemctl restart apache2"
     exec_on_node  ${NODENAME}1 "systemctl restart gmetad"
-    for i in `seq 2 $NBNODE`
+    for i in `seq 1 $NBNODE`
     do
 	echo "- Enable gmond and restart it"
 	exec_on_node ${NODENAME}${i} "systemctl enable gmond"
