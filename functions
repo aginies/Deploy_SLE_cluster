@@ -61,8 +61,13 @@ exec_pssh() {
         exit 1
     fi
     CMD="$1"
-    echo "pssh -h ${PSSHCONF} -x \"-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no\" \"$CMD\""
-    pssh -h ${PSSHCONF} -x "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" "$CMD"
+    for nb in `seq 2 $NBNODE` 
+    do
+        echo "ssh root@${NODENAME}${nb} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $CMD"
+        ssh root@${NODENAME}${nb} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "$CMD"
+    done
+    # echo "pssh -h ${PSSHCONF} -x \"-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no\" \"$CMD\""
+    # pssh -h ${PSSHCONF} -x "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" "$CMD"
 }
 
 # scp a file to a NODE from host
