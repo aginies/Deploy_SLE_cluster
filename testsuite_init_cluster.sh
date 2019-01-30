@@ -18,7 +18,10 @@ check_load_config_file
 
 fix_hostname() {
     echo "############ START fix_hostname"
-    exec_pssh "hostname > /etc/hostname"
+    for i in `seq 1 $NBNODE`
+    do
+	exec_on_node ${NODENAME}${i} "hostname > /etc/hostname"
+    done
 }
 
 
@@ -81,10 +84,6 @@ slurm_configuration() {
     echo "- Prepare slurm.con file"
     perl -pi -e "s/ClusterName.*/ClusterName=linuxsuse/g" slurm.conf
     perl -pi -e "s/ControlMachine.*/ControlMachine=${NODENAME}1/" slurm.conf
-    #NodeName=SLE15sle15hpc1,SLE15sle15hpc2 State=UNKNOWN CoresPerSocket=2 Sockets=2
-    perl -pi -e "s/NodeName.*/NodeName=${NODE_LIST} State=UNKNOWN CoresPerSocket=2 Sockets=2/" slurm.conf
-    #PartitionName=normal Nodes=SLE15sle15hpc1,SLE15sle15hpc2 Default=YES MaxTime=24:00:00 State=UP
-    perl -pi -e "s/PartitionName.*/PartitionName=normal Nodes=${NODE_LIST} Default=YES MaxTime=24:00:00 State=UP/" slurm.conf
 
     echo "- Copy slurm.conf on all nodes" 
     for i in `seq 1 $NBNODE`
@@ -95,13 +94,25 @@ slurm_configuration() {
     echo "- Enable and start slurmctld/munge on all nodes"
     for i in `seq 1 $NBNODE`
     do
+# slurmd -C
+# NodeName=sle15hpc1 CPUs=2 Boards=1 SocketsPerBoard=2 CoresPerSocket=1 ThreadsPerCore=1 RealMemory=1985
+	exec_on_node ${NODENAME}${i} "perl -pi -e 's/NodeName.*/NodeName=${NODENAME}[1-${NBNODE}] State=UNKNOWN CoresPerSocket=2 Sockets=2/' /etc/slurm/slurm.conf"
+	exec_on_node ${NODENAME}${i} "perl -pi -e 's/PartitionName.*/PartitionName=normal Nodes=${NODENAME}[1-${NBNODE}] Default=YES MaxTime=24:00:00 State=UP/' /etc/slurm/slurm.conf"
+	exec_on_node ${NODENAME}${i} "rm /var/lib/slurm/clustername"
+	exec_on_node ${NODENAME}${i} "systemctl stop slurmd"
+	exec_on_node ${NODENAME}${i} "systemctl stop slurmctld"
+	exec_on_node ${NODENAME}${i} "systemctl enable slurmd"
+	exec_on_node ${NODENAME}${i} "systemctl start slurmd"
 	exec_on_node ${NODENAME}${i} "systemctl enable slurmctld"
 	exec_on_node ${NODENAME}${i} "systemctl start slurmctld"
     done
 
     echo "- Check with sinfo on node ${NODENAME}1"
     exec_on_node ${NODENAME}1 "sinfo"
-
+    exec_on_node ${NODENAME}1 "scontrol update NodeName=sle15hpc[1-${NBNODE}] State=UNDRAIN"
+#scontrol show job
+#scontrol show node sle15hpc4
+#scontrol show partition
 }
 
 munge_key() {
@@ -110,7 +121,7 @@ echo "############ START munge_key"
     for i in `seq 2 $NBNODE`
     do
         scp_on_node munge.key "${NODENAME}${i}:/etc/munge/munge.key"
-	exec_on_node ${NODENAME}${i} "chown munge.munge /etc/munge/munge.key"
+	exec_on_node ${NODENAME}${i} "chown munge.munge /etc/munge/munge.key && sync"
 	exec_on_node ${NODENAME}${i} "systemctl enable munge"
 	exec_on_node ${NODENAME}${i} "systemctl restart munge"
     done
@@ -170,10 +181,7 @@ case "$1" in
 	;;
     *)
         echo "
-     Usage: $0 {hostname|nodeslist|ganglia|sshkeynode|slurm|munge|all} [force]
-
- status
-    Check that the cluster is not running before config
+     Usage: $0 {hostname|nodeslist|ganglia|sshkeynode|slurm|munge|all}
 
  hostname
     fix /etc/hostname on all nodes
@@ -195,9 +203,6 @@ case "$1" in
 
  all 
     run all in this order
-
- [force]
-    use force option to bypass cluster check (dangerous)
 "
         exit 1
 esac
