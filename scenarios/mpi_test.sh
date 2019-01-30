@@ -63,7 +63,7 @@ user_mpi() {
     exec_on_node ${NODENAME}1 "chown mpitest.users -R /export/"
     exec_on_node mpitest@${NODENAME}1 "ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ''"
     exec_on_node mpitest@${NODENAME}1 "cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys"
-    exec_on_node mpitest@${NODENAME}1 "echo > ~/.ssh/config <<EOF
+    exec_on_node mpitest@${NODENAME}1 "cat > ~/.ssh/config <<EOF
 Host *
     StrictHostKeyChecking no
 EOF"

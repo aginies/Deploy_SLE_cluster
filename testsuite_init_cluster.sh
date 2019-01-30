@@ -109,7 +109,7 @@ slurm_configuration() {
 
     echo "- Check with sinfo on node ${NODENAME}1"
     exec_on_node ${NODENAME}1 "sinfo"
-    exec_on_node ${NODENAME}1 "scontrol update NodeName=sle15hpc[1-${NBNODE}] State=UNDRAIN"
+#    exec_on_node ${NODENAME}1 "scontrol update NodeName=sle15hpc[1-${NBNODE}] State=UNDRAIN"
 #scontrol show job
 #scontrol show node sle15hpc4
 #scontrol show partition
