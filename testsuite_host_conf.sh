@@ -152,22 +152,22 @@ prepare_auto_deploy_image() {
     WDIRMOUNT="/mnt/tmp_sle"
     mkdir ${WDIRMOUNT} ${WDIR2}
     cd ${STORAGEP}
-    cp -avf ${WDIR}/${VMXML} ${WDIR2}/vm.xml
+    cp -avf ${WDIR}/${VMXML} ${WDIR2}/${VMXML}
     cp -avf ${WDIR}/${VMMINIXML} ${WDIR2}/vm_mini.xml
     sleep 1
-    perl -pi -e "s/NETWORK/${NETWORK}/g" ${WDIR2}/vm.xml
-    perl -pi -e "s/NODEDOMAIN/${NODEDOMAIN}/g" ${WDIR2}/vm.xml
-    perl -pi -e "s/NODENAME/${NODENAME}/g" ${WDIR2}/vm.xml
-    perl -pi -e "s/FHN/${NODENAME}/g" ${WDIR2}/vm.xml
-    perl -pi -e "s/NETWORK/${NETWORK}/g" ${WDIR2}/vm_mini.xml
-    perl -pi -e "s/NODEDOMAIN/${NODEDOMAIN}/g" ${WDIR2}/vm_mini.xml
-    perl -pi -e "s/NODENAME/${NODENAME}/g" ${WDIR2}/vm_mini.xml
-    perl -pi -e "s/FHN/${NODENAME}/g" ${WDIR2}/vm_mini.xml
+    perl -pi -e "s/NETWORK/${NETWORK}/g" ${WDIR2}/${VMXML}
+    perl -pi -e "s/NODEDOMAIN/${NODEDOMAIN}/g" ${WDIR2}/${VMXML}
+    perl -pi -e "s/NODENAME/${NODENAME}/g" ${WDIR2}/${VMXML}
+    perl -pi -e "s/FHN/${NODENAME}/g" ${WDIR2}/${VMXML}
+    perl -pi -e "s/NETWORK/${NETWORK}/g" ${WDIR2}/${VMMINIXML}
+    perl -pi -e "s/NODEDOMAIN/${NODEDOMAIN}/g" ${WDIR2}/${VMMINIXML}
+    perl -pi -e "s/NODENAME/${NODENAME}/g" ${WDIR2}/${VMMINIXML}
+    perl -pi -e "s/FHN/${NODENAME}/g" ${WDIR2}/${VMMINIXML}
     qemu-img create vm_xml.raw -f raw 2M
     mkfs.ext3 vm_xml.raw
     mount vm_xml.raw ${WDIRMOUNT}
-    cp -v ${WDIR2}/vm.xml ${WDIRMOUNT}
-    cp -v ${WDIR2}/vm_mini.xml ${WDIRMOUNT}
+    cp -v ${WDIR2}/${VMXML} ${WDIRMOUNT}
+    cp -v ${WDIR2}/${VMMINIXML} ${WDIRMOUNT}
     umount ${WDIRMOUNT}
     rm -rf ${WDIRMOUNT} ${WDIR2}
 }
@@ -218,9 +218,6 @@ case "$1" in
     autoyastimage)
 	prepare_auto_deploy_image
 	;;
-    checkhostconf)
-	check_host_config
-	;;
     all)
 	ssh_root_key
 	#install_virtualization_stack
@@ -233,7 +230,29 @@ case "$1" in
         ;;
     *)
         echo "
-     Usage: $0 {ssh|vtstack|pssh|etchosts|virtualnet|SHAREpool|autoyastimage|checkhostconf|all}
+     Usage: $0 {ssh|vtstack|pssh|etchosts|virtualnet|SHAREpool|autoyastimage|all}
+     
+ vtstack
+    install virtualization tools and restart libvirtd
+
+ ssh
+    generate an ssh root key, and prepare a config to connect to nodes
+
+ etchosts
+    add nodes in /etc/hosts
+
+ pssh
+    prepare pssh configuration (with list of nodes)
+
+ virtualnet
+    create a Virtual Network: DHCP with host/mac/name/ip for nodes
+
+ SHAREpool
+    create an SHARED pool
+
+ autoyastimage
+    prepapre an image (raw) which contains autoyast file
+
 
 "
 exit 1
