@@ -27,13 +27,14 @@ module load openmpi
 mpicc -o mpi_hello_world mpi_hello_world.c
 EOF"
 
-    exec_on_node impitest@${NODENAME}1 "cd /export && sh /export/build_prepare_mpi.sh"
+    exec_on_node mpitest@${NODENAME}1 "cd /export && sh /export/build_prepare_mpi.sh"
 }
 
 nfs_server() {
     echo "############ START nfs_server"
     exec_on_node ${NODENAME}1 "zypper in -y nfs-utils"
     exec_on_node ${NODENAME}1 "cp -vf /etc/exports /etc/exports.bck"
+    exec_on_node ${NODENAME}1 "mkdir /export" IGNORE=1
     exec_on_node ${NODENAME}1 "echo '/export	*(rw,root_squash,sync,no_subtree_check)' > /etc/exports"
     exec_on_node ${NODENAME}1 "systemctl restart nfs-server.service"
     exec_on_node ${NODENAME}1 "exportfs"
@@ -62,6 +63,10 @@ user_mpi() {
     exec_on_node ${NODENAME}1 "chown mpitest.users -R /export/"
     exec_on_node mpitest@${NODENAME}1 "ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ''"
     exec_on_node mpitest@${NODENAME}1 "cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys"
+    exec_on_node mpitest@${NODENAME}1 "echo > ~/.ssh/config <<EOF
+Host *
+    StrictHostKeyChecking no
+EOF"
 }
 
 nfs_client() {
