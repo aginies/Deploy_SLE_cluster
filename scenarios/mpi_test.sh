@@ -19,7 +19,7 @@ prepare_mpi() {
     echo "############ START prepare_mpi"
     #git clone https://github.com/wesleykendall/mpitutorial
     scp_on_node mpi_hello_world.c "mpitest@${NODENAME}1:/export"
-    exec_on_node mpitest@${NODENAME}1 "zypper in -y make"
+    exec_on_node ${NODENAME}1 "zypper in -y make"
     exec_on_node mpitest@${NODENAME}1 "cat > /export/build_prepare_mpi.sh <<EOF
 #!/bin/sh
 module load gnu
@@ -57,7 +57,8 @@ user_mpi() {
     do
 	exec_on_node ${NODENAME}${i} "useradd -d /export -g users -M -p "a" -u 666 mpitest" IGNORE=1
     done
-    scp_on_node /root/.ssh/${IDRSA}.pub "${NODENAME}1:/export/.ssh/authorized_keys"
+    exec_on_node ${NODENAME}1 "mkdir -p /export/.ssh"
+    scp_on_node ~/.ssh/${IDRSA}.pub "${NODENAME}1:/export/.ssh/authorized_keys"
     exec_on_node ${NODENAME}1 "chown mpitest.users -R /export/"
     exec_on_node mpitest@${NODENAME}1 "ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ''"
     exec_on_node mpitest@${NODENAME}1 "cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys"
@@ -76,15 +77,14 @@ nfs_client() {
 
 back_to_start() {
     echo "############ START back_to_start"
+    exec_on_node  ${NODENAME}1 "cp -vf /etc/exports.bck /etc/exports"
+    exec_on_node  ${NODENAME}1 "systemctl restart nfs-server.service"
     for i in `seq 1 $NBNODE`
     do
 	exec_on_node ${NODENAME}${i} "umount /export"
 	exec_on_node ${NODENAME}${i} "rm -rf /export"
 	exec_on_node ${NODENAME}${i} "userdel mpitest"
     done
-    exec_on_node  ${NODENAME}1 "cp -vf /etc/exports.bck /etc/exports"
-    exec_on_node  ${NODENAME}1 "systemctl restart nfs-server.service"
-
 }
 
 ##########################
@@ -118,6 +118,9 @@ case $1 in
     runmpi)
 	run_mpi
 	;;
+    back)
+	back_to_start
+	;;
     all)
 	nfs_server
 	nfs_client
@@ -126,7 +129,26 @@ case $1 in
 	;;
     *)
 	echo "
-usage of $0 {mpi|nserver|nclient|runmpi|usermpi|all}
+usage of $0 {mpi|nserver|nclient|runmpi|usermpi|back|all}
+
+ nserver
+	prepare an /export dir for testing
+
+ nclient
+	mount /export on all nodes	
+
+ usermpi
+	create an mpitest usr on all nodes (will used /export)
+	deal with ssh key
+
+ mpi
+	compile a basic mpi test with mpicc
+ 
+ runmpi
+	run a basic mpitest on all nodes
+ 
+ restore
+	go back to initial state
 "
 	;;
 esac
