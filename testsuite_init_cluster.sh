@@ -111,16 +111,18 @@ slurm_configuration() {
 scp_nodes_list() {
     echo "############ START scp_nodes_list"
     echo "- Create nodes file"
-    touch nodes
+    NODESF=/tmp/nodes
+    touch ${NODESF}
     for i in `seq 1 $NBNODE`
     do
-        echo ${NODENAME}${i} >> nodes
+        echo ${NODENAME}${i} >> ${NODESF}
     done
     echo "- scp nodes file on all nodes"
     for i in `seq 1 $NBNODE`
     do
-        scp_on_node nodes "${NODENAME}${i}:/etc/nodes"
+        scp_on_node ${NODESF} "${NODENAME}${i}:/etc/nodes"
     done
+    rm -v ${NODESF}
 }
  
 
