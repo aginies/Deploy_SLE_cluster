@@ -7,7 +7,7 @@ you ability to fix the problem if needed.
 
 This scripts will configure:
 * an host (by default KVM)
-* 3 nodes ready
+* 6 nodes ready
 
 All configurations files on the host are dedicated for this cluster, which means
 this should not interact or destroy any other configuration (pool, net, etc...)
@@ -19,10 +19,10 @@ https://github.com/aginies/Deploy_SLE_cluster.git
 
 *NOTE*: default root password for Virtual Machine is: "a"
 
-* *WARNING* All guest installation will be done at the same time (6 nodes), time between install is 5 seconds)
-* *NOTE* You need an other DVD rom and an SLE1XSPX ISO DVD as source for Zypper
+* *WARNING* All guest installation will be done at the same time (6 nodes), time between install is 5 seconds
+* *NOTE* You need an other DVD rom and an SLE1XSPX ISO DVD as source for Zypper (optionnal STM/RMT adjusting autoyast file)
 * *NOTE* Host server should be a SLE or an openSUSE (will use zypper)
-* *WARNING* Running the script will erase all previous deployment configuration
+* *WARNING* Running the script will erase all previous deployment of the same cluster (but not another cluster deployed)
 * *NOTE* Scripts are written in shell to simplify external contribution and modification, of course this choice lead to some technical limitation but the main advantage is to be able to deploy it quickly on any kind of product without any missing dependencies
 
 ## Install / HOWTO

@@ -3,6 +3,7 @@
 HYPERVISOR="kvm"
 
 # CLUSTER NAME
+# IMPORTANT: should be uniq to avoid loosing your VM/config while you are doing another deployment
 CLUSTER="sle15test"
 
 # Path to image storage
