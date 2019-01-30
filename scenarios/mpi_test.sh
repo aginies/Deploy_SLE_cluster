@@ -26,7 +26,6 @@ module load gnu
 module load openmpi
 mpicc -o mpi_hello_world mpi_hello_world.c
 EOF"
-
     exec_on_node mpitest@${NODENAME}1 "cd /export && sh /export/build_prepare_mpi.sh"
 }
 
@@ -36,6 +35,7 @@ nfs_server() {
     exec_on_node ${NODENAME}1 "cp -vf /etc/exports /etc/exports.bck"
     exec_on_node ${NODENAME}1 "mkdir /export" IGNORE=1
     exec_on_node ${NODENAME}1 "echo '/export	*(rw,root_squash,sync,no_subtree_check)' > /etc/exports"
+    exec_on_node ${NODENAME}1 "systemctl enable nfs-server.service"
     exec_on_node ${NODENAME}1 "systemctl restart nfs-server.service"
     exec_on_node ${NODENAME}1 "exportfs"
 }
@@ -46,10 +46,29 @@ run_mpi() {
 #!/bin/sh
 module load gnu
 module load openmpi
-mpirun --allow-run-as-root --hostfile /etc/nodes -n 20 /export/mpi_hello_world
+mpirun --hostfile /etc/nodes -n 20 /export/mpi_hello_world
 EOF"
     exec_on_node mpitest@${NODENAME}1 "cd /export && sh run_mpi_test.sh"
-
+    exec_on_node mpitest@${NODENAME}1 "cat >/export/slurm.sh <<EOF
+#!/usr/bin/env bash
+#Job name
+#SBATCH -J TEST_Slurm
+# Asking for one node
+#SBATCH -N 1
+# Output results message
+#SBATCH -o slurm.sh%j.out
+# Output error message
+#SBATCH -e slurm.sh%j.err
+module purge
+echo '=====my job informations ==== '
+echo 'Node List: ' $SLURM_NODELIST
+echo 'my jobID: ' $SLURM_JOB_ID
+echo 'Partition: ' $SLURM_JOB_PARTITION
+echo 'submit directory:' $SLURM_SUBMIT_DIR
+echo 'submit host:' $SLURM_SUBMIT_HOST
+echo 'In the directory: `pwd`'
+echo 'As the user: `whoami`'
+EOF"
 }
 
 user_mpi() {
@@ -75,6 +94,8 @@ nfs_client() {
     for i in `seq 2 $NBNODE`
     do 
 	exec_on_node ${NODENAME}${i} "zypper in -y nfs-utils"
+	exec_on_node ${NODENAME}${i} "systemctl enable nfs"
+	exec_on_node ${NODENAME}${i} "systemctl start nfs"
 	exec_on_node ${NODENAME}${i} "mkdir /export"
 	exec_on_node ${NODENAME}${i} "mount ${NODENAME}1:/export /export"
     done

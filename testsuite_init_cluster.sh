@@ -75,15 +75,11 @@ slurm_configuration() {
     echo "- Get /etc/slurm/slurm.conf from ${NODENAME}1"
     scp root@${NODENAME}1:/etc/slurm/slurm.conf .
 
-    for i in `seq 1 $NBNODE`
-    do
-	NODE_LIST="$NODE_LIST,${NODENAME}${i}"
-    done
-    echo $NODE_LIST
-
     echo "- Prepare slurm.con file"
     perl -pi -e "s/ClusterName.*/ClusterName=linuxsuse/g" slurm.conf
     perl -pi -e "s/ControlMachine.*/ControlMachine=${NODENAME}1/" slurm.conf
+    perl -pi -e "s/#BackupController.*/BackupController=${NODENAME}2/" slurm.conf
+    perl -pi -e "s/MpiDefault.*/MpiDefault=openmpi/" slurm.conf
 
     echo "- Copy slurm.conf on all nodes" 
     for i in `seq 1 $NBNODE`
@@ -91,7 +87,7 @@ slurm_configuration() {
 	scp_on_node slurm.conf "${NODENAME}${i}:/etc/slurm/"
     done
 
-    echo "- Enable and start slurmctld/munge on all nodes"
+    echo "- Enable and start slurmd on all nodes"
     for i in `seq 1 $NBNODE`
     do
 # slurmd -C
@@ -101,8 +97,13 @@ slurm_configuration() {
 	exec_on_node ${NODENAME}${i} "rm /var/lib/slurm/clustername"
 	exec_on_node ${NODENAME}${i} "systemctl stop slurmd"
 	exec_on_node ${NODENAME}${i} "systemctl stop slurmctld"
+	exec_on_node ${NODENAME}${i} "systemctl disable slurmctld"
 	exec_on_node ${NODENAME}${i} "systemctl enable slurmd"
 	exec_on_node ${NODENAME}${i} "systemctl start slurmd"
+    done
+    # start slurmctld on node 1 and 2 (backup)
+    for i in `seq 1 2`
+    do
 	exec_on_node ${NODENAME}${i} "systemctl enable slurmctld"
 	exec_on_node ${NODENAME}${i} "systemctl start slurmctld"
     done
