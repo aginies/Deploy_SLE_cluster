@@ -107,6 +107,23 @@ slurm_configuration() {
 
 }
 
+
+scp_nodes_list() {
+    echo "############ START scp_nodes_list"
+    echo "- Create nodes file"
+    touch nodes
+    for i in `seq 1 $NBNODE`
+    do
+        echo ${NODENAME}${i} >> nodes
+    done
+    echo "- scp nodes file on all nodes"
+    for i in `seq 1 $NBNODE`
+    do
+        scp_on_node nodes "${NODENAME}${i}:/etc/nodes"
+    done
+}
+ 
+
 ##########################
 ##########################
 ### MAIN
@@ -118,9 +135,6 @@ case "$1" in
     hostname)
 	fix_hostname
 	;;
-    init)
-	init_cluster
-	;;
     sshkeynode)
 	copy_ssh_key_on_nodes
 	;;
@@ -130,14 +144,18 @@ case "$1" in
     ganglia)
 	ganglia_web
 	;;
+    nodeslist)
+    scp_nodes_list
+    ;;
     all)
 	fix_hostname
-	init_cluster
-	copy_ssh_key_on_nodes
+    scp_nodes_list
+    slurm
+    ganglia
 	;;
     *)
         echo "
-     Usage: $0 {hostname|init|sshkeynode|slurm|all} [force]
+     Usage: $0 {hostname|nodeslist|ganglia|sshkeynode|slurm|all} [force]
 
  status
     Check that the cluster is not running before config
@@ -145,14 +163,14 @@ case "$1" in
  hostname
     fix /etc/hostname on all nodes
 
- init
-    Init the cluster
-
  slurm
     configure slurm on all nodes (and enable and start the service)
 
  ganglia
     configure apache and get ganglia up
+
+ nodeslist
+    copy the full nodes list to all nodes in /etc/nodes file
 
  sshkeynode
     Copy Cluster Internal key (from ${NODENAME}1) to all other HA nodes
