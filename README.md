@@ -53,13 +53,13 @@ Configure the host:
 * generate an ssh root key, and prepare a config to connect to nodes
 * add nodes in /etc/hosts
 * create a Virtual Network: DHCP with host/mac/name/ip for nodes
-* create an SHARED pool
-* prepapre an image (raw) which contains autoyast file
+* create a SHARED pool
+* prepare an image (raw) which contains autoyast file
 
 ### testsuite_deploy_vm.sh
 This script will install all nodes with needed data
 * clean-up all previous data: VM definition, VM images
-* create an slepool to store VM images
+* create a slepool to store VM images
 * install all VM (using a screen)
 * display information how to copy host root key to nodes (VM)
 
