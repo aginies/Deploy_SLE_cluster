@@ -27,7 +27,6 @@ slurm_down_up() {
 }
 
 #scontrol show job
-#scontrol show node sle15hpc4
 #scontrol show partition
 
 ##########################
