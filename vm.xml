@@ -254,10 +254,9 @@
     <packages config:type="list">
       <package>openssh</package>
       <package>zypper</package>
-      <package>gnome-terminal</package>
+<!--  <package>gnome-terminal</package>
+      <package>gdm</package> -->
       <package>vim</package>
-      <package>gdm</package>
-      <!--      <package>ntp</package> -->
       <package>strace</package>
       <package>less</package>
       <package>man</package>
