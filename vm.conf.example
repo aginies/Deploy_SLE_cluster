@@ -3,7 +3,6 @@
 HYPERVISOR="kvm"
 
 # CLUSTER NAME
-# IMPORTANT: should be uniq to avoid loosing your VM/config while you are doing another deployment
 CLUSTER="sle15test"
 
 # Path to image storage
@@ -18,22 +17,17 @@ IDRSA="id_rsa_SLE"
 # PSSH
 PSSHCONF="/etc/nodes_${CLUSTER}"
 
-# Virtual network name
+# Virtual network name HOST
 NETMACHOST="52:54:00:89:b0:C9"
 UUID="951e50f1-db73-475a-895f-28304baf8e8f"
 BRIDGE="vibr3"
 NODENAME="sle15hpc"
+
+# VM
 # number of nodes (MAX9) and MACADDR
-NBNODE=6
-MAC1="52:54:00:b7:92:aa"
-MAC2="52:54:00:b7:92:bb"
-MAC3="52:54:00:b7:92:cc"
-MAC4="52:54:00:b7:92:dd"
-MAC5="52:54:00:b7:92:ee"
-MAC6="52:54:00:b7:92:ef"
-MAC7="52:54:00:b7:92:af"
-MAC8="52:54:00:b7:92:bf"
-MAC9="52:54:00:b7:92:cf"
+NBNODE=5
+# incomplete MAC: the last input will be a nnumber, ie node1: ${MAC}1, node2: ${MAC}2
+MAC="52:54:00:b7:92:a"
 
 NODEDOMAIN="hpc.com"
 NETWORKNAME="slenet"
