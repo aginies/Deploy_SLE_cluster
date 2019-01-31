@@ -17,7 +17,7 @@ check_load_config_file
 
 
 fix_hostname() {
-    echo "############ START fix_hostname"
+    echo $I "############ START fix_hostname" $O
     for i in `seq 1 $NBNODE`
     do
 	exec_on_node ${NODENAME}${i} "hostname > /etc/hostname"
@@ -25,16 +25,9 @@ fix_hostname() {
 }
 
 
-# Check cluster Active
-
-# Init the cluster on node ${NODENAME}1
-init_cluster() {
-    echo "############ START init the cluster"
-}
-
 copy_ssh_key_on_nodes() {
-    echo "############ START copy_ssh_key_on_nodes"
-    echo "- Generate ssh ssh root key on node ${NODENAME}1"
+    echo $I "############ START copy_ssh_key_on_nodes"
+    echo "- Generate ssh ssh root key on node ${NODENAME}1" $O
     exec_on_node ${NODENAME}1 "ssh-keygen -t rsa -N '' -f /root/.ssh/id_rsa"
     echo "- Copy ssh root key from node ${NODENAME}1 to all nodes"
     scp -o StrictHostKeyChecking=no root@${NODENAME}1:~/.ssh/id_rsa.pub /tmp/
@@ -51,8 +44,8 @@ copy_ssh_key_on_nodes() {
 }
 
 ganglia_web() {
-    echo "############ START ganglia_web"
-    echo "- Enable php7 and restart apache2"
+    echo $I "############ START ganglia_web"
+    echo "- Enable php7 and restart apache2" $O
     exec_on_node  ${NODENAME}1 "a2enmod php7"
     exec_on_node  ${NODENAME}1 "systemctl enable apache2"
     exec_on_node  ${NODENAME}1 "systemctl restart apache2"
@@ -70,7 +63,7 @@ ganglia_web() {
 
 slurm_configuration() {
 
-    echo "############ START create a slurm_configuration"
+    echo $I "############ START create a slurm_configuration" $O
 
     echo "- Get /etc/slurm/slurm.conf from ${NODENAME}1"
     scp root@${NODENAME}1:/etc/slurm/slurm.conf .
@@ -117,7 +110,7 @@ slurm_configuration() {
 }
 
 munge_key() {
-echo "############ START munge_key"
+    echo $I "############ START munge_key" $O
     scp ${NODENAME}1:/etc/munge/munge.key .
     for i in `seq 2 $NBNODE`
     do
@@ -130,7 +123,7 @@ echo "############ START munge_key"
 }
 
 scp_nodes_list() {
-    echo "############ START scp_nodes_list"
+    echo $I "############ START scp_nodes_list" $O
     echo "- Create nodes file"
     NODESF=/tmp/nodes
     touch ${NODESF}

@@ -24,9 +24,9 @@ if [ ! -f ${SLECDROM} ]; then echo "! ${SLECDROM} can not be found, needed for i
 # clean up previous VM
 cleanup_vm() {
     NAME="${NODENAME}"
-    echo "############ START cleanup_vm #############"
+    echo $I "############ START cleanup_vm #############"
     echo "  !! WARNING !! "
-    echo "  !! WARNING !! "
+    echo "  !! WARNING !! " $O
     if [ -d ${STORAGEP}/${LIBVIRTPOOL} ]; then
         echo "- This will remove previous VM guest image (in ${STORAGEP}/${LIBVIRTPOOL} dir)"
         cd ${STORAGEP}/${LIBVIRTPOOL}
@@ -56,7 +56,7 @@ cleanup_vm() {
 
 # Install VM 1
 install_vm() {
-    echo "############ START install_vm #############"
+    echo $I "############ START install_vm #############" $O
     # pool refresh to avoid error
     virsh pool-refresh ${LIBVIRTPOOL}
     echo "- Create new VM guest image file: ${NAME}.qcow2 ${IMAGESIZE}"
@@ -87,7 +87,7 @@ install_vm() {
 }
 
 check_before_install() {
-    echo "############ START check_before_install #############"
+    echo $I "############ START check_before_install #############" $O
     if [ ! -f ${DISKVM} ]; then 
         echo "- ${DISKVM} NOT present, needed for auto installation"; exit 1
     else
@@ -101,7 +101,7 @@ check_before_install() {
 }
 
 copy_ssh_key() {
-    echo "- Don't forget to copy the root host SSH key to VM guest"
+    echo $I "- Don't forget to copy the root host SSH key to VM guest" $O
     for NB in `seq 1 $NBNODE`
 	do
 	echo "ssh-copy-id -f -i /root/.ssh/${IDRSA}.pub -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ${NODENAME}${NB}"

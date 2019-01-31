@@ -20,8 +20,8 @@ check_load_config_file
 
 # Install all needed Hypervisors tools
 install_virtualization_stack() {
-    echo "############ START install_virtualization_stack #############"
-    echo "- patterns-sles-${HYPERVISOR}_server patterns-sles-${HYPERVISOR}_tools and restart libvirtd"
+    echo $I "############ START install_virtualization_stack #############"
+    echo "- patterns-sles-${HYPERVISOR}_server patterns-sles-${HYPERVISOR}_tools and restart libvirtd" $O
     zypper in -y patterns-sles-${HYPERVISOR}_server
     zypper in -y patterns-sles-${HYPERVISOR}_tools
     echo "- Restart libvirtd"
@@ -31,8 +31,8 @@ install_virtualization_stack() {
 # ssh root key on host
 # should be without password to speed up command on NODE
 ssh_root_key() {
-    echo "############ START ssh_root_key #############"
-    echo "- Generate ~/.ssh/${IDRSA} without password"
+    echo $i "############ START ssh_root_key #############"
+    echo "- Generate ~/.ssh/${IDRSA} without password" $O
     ssh-keygen -t rsa -f ~/.ssh/${IDRSA} -N ""
     echo "- Create /root/.ssh/config for nodes access"
     CONFIGSSH="/root/.ssh/config"
@@ -55,8 +55,8 @@ IdentityFile /root/.ssh/${IDRSA}
 # pssh will be used
 # Command from Host
 prepare_remote_pssh() {
-    echo "############ START prepare_remote_pssh #############"
-    echo "- Install pssh and create ${PSSHCONF}"
+    echo $I "############ START prepare_remote_pssh #############"
+    echo "- Install pssh and create ${PSSHCONF}" $O
     zypper in -y pssh
     echo ${NODENAME}1 > ${PSSHCONF}
     for i in `seq 2 $NBNODE`
@@ -67,7 +67,7 @@ prepare_remote_pssh() {
 
 # ADD node to /etc/hosts (hosts)
 prepare_etc_hosts() {
-    echo "############ START prepare_etc_hosts #############"
+    echo $I "############ START prepare_etc_hosts #############" $O
     grep ${NODENAME}1.${NODEDOMAIN} /etc/hosts
     if [ $? == "1" ]; then
         echo "- Prepare /etc/hosts (adding nodes)"
@@ -83,8 +83,8 @@ prepare_etc_hosts() {
 # Define net private network (NAT)
 # NETWORK will be ${NETWORK}.0/24 gw/dns ${NETWORK}.1
 prepare_virtual_network() {
-    echo "############ START prepare_virtual_network #############"
-    echo "- Prepare virtual network (/etc/libvirt/qemu/networks/${NETWORKNAME}.xml)"
+    echo $I "############ START prepare_virtual_network #############"
+    echo "- Prepare virtual network (/etc/libvirt/qemu/networks/${NETWORKNAME}.xml)" $O
     cat > /etc/libvirt/qemu/networks/${NETWORKNAME}.xml << EOF
 <network>
   <name>${NETWORKNAME}</name>
@@ -119,7 +119,7 @@ EOF
 
 # Create an SHARE pool on the host 
 prepare_SHARE_pool() {
-    echo "############ START prepare_SHARE_pool"
+    echo $I "############ START prepare_SHARE_pool" $O
 # Create a shared pool 
     virsh pool-list --all | grep ${SHARENAME} > /dev/null
     if [ $? == "0" ]; then
@@ -145,8 +145,8 @@ prepare_SHARE_pool() {
 
 # Create a RAW file which contains auto install file for deployment
 prepare_auto_deploy_image() {
-    echo "############ START prepare_auto_deploy_image #############"
-    echo "- Prepare the autoyast image for VM guest installation (vm_xml.raw)"
+    echo $I "############ START prepare_auto_deploy_image #############"
+    echo "- Prepare the autoyast image for VM guest installation (vm_xml.raw)" $O
     WDIR=`pwd`
     WDIR2="/tmp/tmp_sle"
     WDIRMOUNT="/mnt/tmp_sle"
@@ -173,8 +173,8 @@ prepare_auto_deploy_image() {
 }
 
 check_host_config() {
-    echo "############ START check_host_config #############"
-    echo "- Show net-list"
+    echo $I "############ START check_host_config #############"
+    echo "- Show net-list" $O
     virsh net-list
     echo "- Display pool available"
     virsh pool-list
@@ -188,13 +188,13 @@ check_host_config() {
 ###########################
 ###########################
 
-echo "############ PREPARE HOST #############"
+echo $I "############ PREPARE HOST #############"
 echo "  !! WARNING !! "
 echo "  !! WARNING !! "
 echo 
 echo "  This will remove any previous Host configuration for VM guests and testing"
 echo
-echo " press [ENTER] twice OR Ctrl+C to abort"
+echo "########################################"$O
 
 case "$1" in
     ssh)

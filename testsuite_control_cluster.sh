@@ -17,7 +17,7 @@ check_load_config_file
 
 
 slurm_down_up() {
-	echo "############ START slurm_down_up"
+	echo $I "############ START slurm_down_up" $O
 	exec_on_node ${NODENAME}1 "scontrol show node"
 	exec_on_node ${NODENAME}1 "sinfo"
 	exec_on_node ${NODENAME}1 "scontrol update NodeName=sle15hpc[1-${NBNODE}] State=down Reason=hung_proc"
