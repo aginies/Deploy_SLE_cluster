@@ -47,12 +47,14 @@ run_mpi() {
 #Job name
 #S -J plop
 # Asking for one node
-#S -N 4
+#S -N 8
 module load gnu
 module load openmpi
-mpirun /export/mpi_hello_world
+mpirun -n 8 /export/mpi_hello_world
 EOF"
-    exec_on_node mpitest@${NODENAME}1 "cd /export && sh run_mpi_test.sh"
+    exec_on_node mpitest@${NODENAME}1 "sh /export/run_mpi_test.sh"
+    exec_on_node mpitest@${NODENAME}1 "sbatch -n 8 run_mpi_test.sh"
+
     exec_on_node mpitest@${NODENAME}1 "cat >/export/slurm.sh <<EOF
 #!/usr/bin/env bash
 #Job name
