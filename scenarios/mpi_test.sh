@@ -16,7 +16,7 @@ check_load_config_file other
 
 
 prepare_mpi() {
-    echo "############ START prepare_mpi"
+    echo $I "############ START prepare_mpi" $O
     #git clone https://github.com/wesleykendall/mpitutorial
     scp_on_node mpi_hello_world.c "mpitest@${NODENAME}1:/export"
     exec_on_node ${NODENAME}1 "zypper in -y make"
@@ -30,7 +30,7 @@ EOF"
 }
 
 nfs_server() {
-    echo "############ START nfs_server"
+    echo $I "############ START nfs_server" $O
     exec_on_node ${NODENAME}1 "zypper in -y nfs-utils"
     exec_on_node ${NODENAME}1 "cp -vf /etc/exports /etc/exports.bck"
     exec_on_node ${NODENAME}1 "mkdir /export" IGNORE=1
@@ -41,7 +41,7 @@ nfs_server() {
 }
 
 run_mpi() {
-    echo "############ START run_mpi"
+    echo $I "############ START run_mpi" $O
     exec_on_node mpitest@${NODENAME}1 "cat > /export/run_mpi_test.sh <<EOF
 #!/usr/bin/env bash
 #Job name
@@ -78,7 +78,7 @@ EOF"
 }
 
 user_mpi() {
-    echo "############ START user_mpi"
+    echo $I "############ START user_mpi" $O
     for i in `seq 1 $NBNODE`
     do
 	exec_on_node ${NODENAME}${i} "useradd -d /export -g users -G slurm -M -p "a" -u 666 mpitest" IGNORE=1
@@ -95,7 +95,7 @@ EOF"
 }
 
 nfs_client() {
-    echo "############ START nfs_client"
+    echo $I "############ START nfs_client" $O
     # only starting from NODE2 as node1 export the NFS dir
     for i in `seq 2 $NBNODE`
     do 
@@ -108,7 +108,7 @@ nfs_client() {
 }
 
 back_to_start() {
-    echo "############ START back_to_start"
+    echo $I "############ START back_to_start" $O
     exec_on_node  ${NODENAME}1 "cp -vf /etc/exports.bck /etc/exports"
     exec_on_node  ${NODENAME}1 "systemctl restart nfs-server.service"
     for i in `seq 1 $NBNODE`
@@ -125,10 +125,10 @@ back_to_start() {
 ##########################
 ##########################
 
-echo "############ MPI TEST SCENARIO #############"
+echo $I "############ MPI TEST SCENARIO #############"
 echo
 echo " One node will NFS export /export  (${NODENAME}1)"
-echo
+echo $O
 #echo " press [ENTER] twice OR Ctrl+C to abort"
 #read
 #read
