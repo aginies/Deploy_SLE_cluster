@@ -43,10 +43,14 @@ nfs_server() {
 run_mpi() {
     echo "############ START run_mpi"
     exec_on_node mpitest@${NODENAME}1 "cat > /export/run_mpi_test.sh <<EOF
-#!/bin/sh
+#!/usr/bin/env bash
+#Job name
+#S -J plop
+# Asking for one node
+#S -N 4
 module load gnu
 module load openmpi
-mpirun --hostfile /etc/nodes -n 20 /export/mpi_hello_world
+mpirun /export/mpi_hello_world
 EOF"
     exec_on_node mpitest@${NODENAME}1 "cd /export && sh run_mpi_test.sh"
     exec_on_node mpitest@${NODENAME}1 "cat >/export/slurm.sh <<EOF
