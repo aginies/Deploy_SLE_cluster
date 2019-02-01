@@ -107,6 +107,8 @@ slurm_configuration() {
 #scontrol show job
 #scontrol show node sle15hpc4
 #scontrol show partition
+    # delete local slurm.conf file
+    rm -v slurm.conf
 }
 
 munge_key() {
