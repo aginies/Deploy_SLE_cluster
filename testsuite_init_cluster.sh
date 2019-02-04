@@ -87,7 +87,7 @@ slurm_configuration() {
 # NodeName=sle15hpc1 CPUs=2 Boards=1 SocketsPerBoard=2 CoresPerSocket=1 ThreadsPerCore=1 RealMemory=1985
 	exec_on_node ${NODENAME}${i} "perl -pi -e 's/NodeName.*/NodeName=${NODENAME}[1-${NBNODE}] State=UNKNOWN CoresPerSocket=2 Sockets=2/' /etc/slurm/slurm.conf"
 	exec_on_node ${NODENAME}${i} "perl -pi -e 's/PartitionName.*/PartitionName=normal Nodes=${NODENAME}[1-${NBNODE}] Default=YES MaxTime=24:00:00 State=UP/' /etc/slurm/slurm.conf"
-	exec_on_node ${NODENAME}${i} "rm /var/lib/slurm/clustername"
+	exec_on_node ${NODENAME}${i} "rm /var/lib/slurm/clustername" IGNORE=1
 	exec_on_node ${NODENAME}${i} "systemctl stop slurmd"
 	exec_on_node ${NODENAME}${i} "systemctl stop slurmctld"
 	exec_on_node ${NODENAME}${i} "systemctl disable slurmctld"
@@ -114,6 +114,8 @@ slurm_configuration() {
 munge_key() {
     echo $I "############ START munge_key" $O
     scp ${NODENAME}1:/etc/munge/munge.key .
+    exec_on_node ${NODENAME}1 "systemctl enable munge"
+    exec_on_node ${NODENAME}1 "systemctl restart munge"
     for i in `seq 2 $NBNODE`
     do
         scp_on_node munge.key "${NODENAME}${i}:/etc/munge/munge.key"
@@ -182,11 +184,11 @@ case "$1" in
  hostname
     fix /etc/hostname on all nodes
 
- slurm
-    configure slurm on all nodes (and enable and start the service)
-
  munge
     copy munger.key from ${NODENAME}1 to all other nodes
+
+ slurm
+    configure slurm on all nodes (and enable and start the service)
 
  ganglia
     configure apache and get ganglia up
