@@ -20,9 +20,9 @@ slurm_down_up() {
 	echo $I "############ START slurm_down_up" $O
 	exec_on_node ${NODENAME}1 "scontrol show node"
 	exec_on_node ${NODENAME}1 "sinfo"
-	exec_on_node ${NODENAME}1 "scontrol update NodeName=sle15hpc[1-${NBNODE}] State=down Reason=hung_proc"
+	exec_on_node ${NODENAME}1 "scontrol update NodeName=${NODENAME}[1-${NBNODE}] State=down Reason=hung_proc"
 	sleep 3
-	exec_on_node ${NODENAME}1 "scontrol update NodeName=sle15hpc[1-${NBNODE}] State=resume"
+	exec_on_node ${NODENAME}1 "scontrol update NodeName=${NODENAME}[1-${NBNODE}] State=resume"
 	exec_on_node ${NODENAME}1 "sinfo"
 }
 
