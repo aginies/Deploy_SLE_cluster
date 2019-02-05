@@ -71,9 +71,9 @@ prepare_etc_hosts() {
     grep ${NODENAME}1.${NODEDOMAIN} /etc/hosts
     if [ $? == "1" ]; then
         echo "- Prepare /etc/hosts (adding nodes)"
-	for i in `seq 1 to $NBNODE`
+	for i in `seq 1 $NBNODE`
 		do
-		echo "${NETWORK}.${i}  ${NODENAME}${i}.${NODEDOMAIN} ${NODENAME}${i}" >> /etc/hosts
+		echo "${NETWORK}.10${i}  ${NODENAME}${i}.${NODEDOMAIN} ${NODENAME}${i}" >> /etc/hosts
 	done
     else
         echo "- /etc/hosts already ok"
