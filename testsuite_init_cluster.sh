@@ -85,7 +85,7 @@ slurm_configuration() {
     do
 # slurmd -C
 # NodeName=sle15hpc1 CPUs=2 Boards=1 SocketsPerBoard=2 CoresPerSocket=1 ThreadsPerCore=1 RealMemory=1985
-	exec_on_node ${NODENAME}${i} "perl -pi -e 's/NodeName.*/NodeName=${NODENAME}[1-${NBNODE}] State=UNKNOWN CoresPerSocket=2 Sockets=2/' /etc/slurm/slurm.conf"
+	exec_on_node ${NODENAME}${i} "perl -pi -e 's/NodeName.*/NodeName=${NODENAME}[1-${NBNODE}] State=UNKNOWN CPUs=2 Boards=1 SocketsPerBoard=2 CoresPerSocket=1 ThreadsPerCore=1/' /etc/slurm/slurm.conf"
 	exec_on_node ${NODENAME}${i} "perl -pi -e 's/PartitionName.*/PartitionName=normal Nodes=${NODENAME}[1-${NBNODE}] Default=YES MaxTime=24:00:00 State=UP/' /etc/slurm/slurm.conf"
 	exec_on_node ${NODENAME}${i} "rm /var/lib/slurm/clustername" IGNORE=1
 	exec_on_node ${NODENAME}${i} "systemctl stop slurmd"
