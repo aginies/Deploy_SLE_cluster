@@ -62,9 +62,9 @@ EOF"
 # Asking for one node
 #SBATCH -N 1
 # Output results message
-#SBATCH -o slurm.sh%j.out
+#SBATCH -o slurm-%j.out
 # Output error message
-#SBATCH -e slurm.sh%j.err
+#SBATCH -e slurm-%j.err
 module purge
 echo '=====my job informations ==== '
 echo 'Node List: ' $SLURM_NODELIST
@@ -99,10 +99,11 @@ nfs_client() {
     # only starting from NODE2 as node1 export the NFS dir
     for i in `seq 2 $NBNODE`
     do 
-	exec_on_node ${NODENAME}${i} "zypper in -y nfs-utils"
+#	exec_on_node ${NODENAME}${i} "zypper in -y nfs-utils"
 	exec_on_node ${NODENAME}${i} "systemctl enable nfs"
 	exec_on_node ${NODENAME}${i} "systemctl start nfs"
-	exec_on_node ${NODENAME}${i} "mkdir /export"
+	exec_on_node ${NODENAME}${i} "mkdir /export" IGNORE=1
+	exec_on_node ${NODENAME}${i} "echo '${NODENAME}1:/export	/eport	nfs	noauto,rw,bg,exec,suid,dev,soft,nolock,async 0 0' >> /etc/fstab"
 	exec_on_node ${NODENAME}${i} "mount ${NODENAME}1:/export /export"
     done
 }
