@@ -17,7 +17,7 @@ check_load_config_file other
 SUPERLUVERSION=5.2.1
 
 prepare_superlu() {
-    echo $I "############ START prepare_mpi" $O
+    echo $I "############ START prepare_superlu" $O
     echo $I "-Install superlu on node ${NODENAME}1" $O
     exec_on_node ${NODENAME}1 "zypper in -y libsuperlu-gnu-hpc"
 }
