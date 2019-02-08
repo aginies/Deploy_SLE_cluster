@@ -144,6 +144,22 @@ scp_nodes_list() {
 }
  
 
+create_test_user() {
+    echo $I "############ START create_test_user" $O
+    for i in `seq 1 $NBNODE`
+    do
+        exec_on_node ${NODENAME}${i} "useradd -d /home/test -g users -G slurm -M -p "a" -u 667 test" IGNORE=1
+	exec_on_node ${NODENAME}${i} "mkdir -p /home/test/.ssh" IGNORE=1
+        scp_on_node ~/.ssh/${IDRSA}.pub "${NODENAME}${i}:/home/test/.ssh/authorized_keys"
+	exec_on_node ${NODENAME}${i} "chown test.users -R /home/test/"
+	exec_on_node test@${NODENAME}${i} "cat > ~/.ssh/config <<EOF
+Host *
+    StrictHostKeyChecking no
+EOF"
+    done
+
+}
+
 ##########################
 ##########################
 ### MAIN
@@ -168,18 +184,22 @@ case "$1" in
 	ganglia_web
 	;;
     nodeslist)
-    scp_nodes_list
-    ;;
+    	scp_nodes_list
+    	;;
+    testuser)
+	create_test_user
+	;;
     all)
-    fix_hostname
-    scp_nodes_list
-    munge_key
-    slurm_configuration
-    ganglia_web
+    	fix_hostname
+	scp_nodes_list
+	munge_key
+	slurm_configuration
+	ganglia_web
+	create_test_user
 	;;
     *)
         echo "
-     Usage: $0 {hostname|nodeslist|ganglia|sshkeynode|slurm|munge|all}
+     Usage: $0 {hostname|nodeslist|ganglia|sshkeynode|slurm|munge|testuser|all}
 
  hostname
     fix /etc/hostname on all nodes
@@ -198,6 +218,9 @@ case "$1" in
 
  sshkeynode
     Copy Cluster Internal key (from ${NODENAME}1) to all other HA nodes
+
+ testuser
+    create a test user
 
  all 
     run all in this order
