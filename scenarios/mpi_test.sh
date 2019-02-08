@@ -53,9 +53,10 @@ module load openmpi
 mpirun -n 8 /export/mpi_hello_world
 EOF"
     exec_on_node mpitest@${NODENAME}1 "sh /export/run_mpi_test.sh"
+    exec_on_node mpitest@${NODENAME}1 "module load gnu && module load openmpi && mpirun --hostfile /etc/nodes -n 8 /export/mpi_hello_world"
     exec_on_node mpitest@${NODENAME}1 "sbatch -n 8 run_mpi_test.sh"
 
-    exec_on_node mpitest@${NODENAME}1 "cat >/export/slurm.sh <<EOF
+    cat >slurm_exec.sh <<EOF
 #!/usr/bin/env bash
 #Job name
 #SBATCH -J TEST_Slurm
@@ -72,9 +73,10 @@ echo 'my jobID: ' $SLURM_JOB_ID
 echo 'Partition: ' $SLURM_JOB_PARTITION
 echo 'submit directory:' $SLURM_SUBMIT_DIR
 echo 'submit host:' $SLURM_SUBMIT_HOST
-echo 'In the directory: `pwd`'
-echo 'As the user: `whoami`'
-EOF"
+echo 'In the directory: \`pwd\`'
+echo 'As the user: \`whoami\`'
+EOF
+    scp_on_node slurm_exec.sh "mpitest@${NODENAME}1:/export"
 }
 
 user_mpi() {
