@@ -16,7 +16,7 @@ check_load_config_file other
 
 prepare_imb() {
     echo $I "############ START prepare_imb" $O
-    echo $I "-Install superlu on node ${NODENAME}1" $O
+    echo $I "-Install imb on node ${NODENAME}1" $O
     exec_on_node ${NODENAME}1 "zypper in -y imb-gnu-mpich-hpc imb-gnu-openmpi2-hpc"
 }
 
@@ -77,7 +77,7 @@ case $1 in
 	;;
     *)
 	echo "
-usage of $0 {imb||run|clean|all}
+usage of $0 {imb|run|clean|all}
 
  imb
 	install IMB on node1
