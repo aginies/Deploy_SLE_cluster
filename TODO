@@ -1,6 +1,5 @@
 need to test:
-ocr
-hypre
+hypre WIP aginies
 scipy
 metis
 gsl
