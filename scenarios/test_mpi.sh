@@ -77,6 +77,7 @@ echo 'In the directory: \`pwd\`'
 echo 'As the user: \`whoami\`'
 EOF
     scp_on_node slurm_exec.sh "mpitest@${NODENAME}1:/export"
+    rm -f slurm_exec.sh
 }
 
 user_mpi() {
