@@ -28,7 +28,7 @@ run_imb() {
 cd /usr/lib/hpc/gnu7/openmpi2/imb/2019.1/bin/
 module available
 module load gnu
-module load openmpi/2.1.5
+module load openmpi
 echo "--------------- RUN IMB-EXT"
 ./IMB-EXT 
 echo
