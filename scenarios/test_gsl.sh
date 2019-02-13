@@ -25,7 +25,9 @@ run_gsl() {
     echo $I "############ START run_gsl" $O
     cat > ${RSCRIPTNAME} <<EOF
 #!/bin/sh
-cd examples
+${EXAMPLED}=gsl-examples
+cp -a /usr/share/doc/packages/${EXAMPLED} ${EXAMPLED}
+cd ${EXAMPLED}
 module available
 module load gnu
 module load gsl

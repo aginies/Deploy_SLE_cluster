@@ -25,7 +25,9 @@ run_hypre() {
     echo $I "############ START run_hypre" $O
     cat > ${RSCRIPTNAME} <<EOF
 #!/bin/sh
-cp -a /usr/share/doc/hpc//hypre/5.?.?/examples ~/examples
+EXAMPLED=hypre-examples
+cp -a /usr/share/doc/packages/${EXAMPLED} ~/${EXAMPLED}
+cd ~/${EXAMPLED}
 module available
 module load gnu
 module load blas
