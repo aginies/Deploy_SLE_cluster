@@ -25,17 +25,20 @@ run_metis() {
     echo $I "############ START run_metis" $O
     cat > ${RSCRIPTNAME} <<EOF
 #!/bin/sh
-cd /usr/lib/hpc/gnu7/metis/5.?.?/bin
-GRAPHSD=/usr/share/doc/metis/graphs/
+GRAPHSD=/usr/share/doc/packages/metis-examples/graphs/
+rm -rf \${LDIR}
+LDIR=metis-graphs
+cp -a \${GRAPHSD} \${LDIR}
 module available
 module load gnu
 module load metis
-./graphchk ${GRAPHSD}/4elt.graph
-./graphchk ${GRAPHSD}/mdual.graph
-./gpmetis ${GRAPHSD}/mdual.graph 4
-./ndmetis ${GRAPHSD}/mdual.graph
-./ndmetis ${GRAPHSD}/copter2.graph
-./m2gmetis ${GRAPHSD}/metis.mesh ${GRAPHSD}/copter2.graph
+cd \${METIS_DIR}/bin
+./graphchk ~/\${LDIR}/4elt.graph
+./graphchk ~/\${LDIR}/mdual.graph
+./gpmetis ~/\${LDIR}/mdual.graph 4
+./ndmetis ~/\${LDIR}/mdual.graph
+./ndmetis ~/\${LDIR}/copter2.graph
+./m2gmetis ~/\${LDIR}/metis.mesh ~/\${LDIR}/copter2.graph
 EOF
     scp_on_node ${RSCRIPTNAME} "test@${NODENAME}1:~/"
     exec_on_node test@${NODENAME}1 "sh ${RSCRIPTNAME}"
