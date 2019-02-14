@@ -25,10 +25,11 @@ run_imb() {
     echo $I "############ START run_imb" $O
     cat > ${RSCRIPTNAME} <<EOF
 #!/bin/sh
-cd /usr/lib/hpc/gnu7/openmpi2/imb/2019.1/bin/
 module available
 module load gnu
 module load openmpi
+module load imb
+cd \$IMB_DIR/bin/
 echo "--------------- RUN IMB-EXT"
 ./IMB-EXT 
 echo
