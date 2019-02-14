@@ -20,14 +20,15 @@ prepare_gsl() {
     exec_on_node ${NODENAME}1 "zypper in -y gsl-gnu-hpc* gsl-devel gsl_2_5-gnu-hpc-doc gsl_2_5-gnu-hpc-module gsl_2_5-gnu-hpc-devel"
 }
 
-RSCRIPTNAME=run_gsl.sh
+RBSCRIPTNAME=build_run_gsl.sh
+EXAMPLED=gsl-examples
 run_gsl() {
     echo $I "############ START run_gsl" $O
     cat > ${RSCRIPTNAME} <<EOF
 #!/bin/sh
-${EXAMPLED}=gsl-examples
-cp -a /usr/share/doc/packages/${EXAMPLED} ${EXAMPLED}
-cd ${EXAMPLED}
+EXAMPLED=gsl-examples
+cp -a /usr/share/doc/packages/gsl_2_5-gnu-hpc-examples/examples \${EXAMPLED}
+cd \${EXAMPLED}
 module available
 module load gnu
 module load gsl
@@ -36,16 +37,17 @@ for code in \`ls *.c\`
 do
 gcc -lgsl -lopenblas -lm -ldl \${code} -o \${code}.bin
 ./\${code}.bin
-done 
+done
 EOF
-    scp_on_node ${RSCRIPTNAME} "test@${NODENAME}1:~/"
-    exec_on_node test@${NODENAME}1 "sh ${RSCRIPTNAME}"
-    rm ${RSCRIPTNAME}
+    scp_on_node ${RBSCRIPTNAME} "test@${NODENAME}1:~/"
+    exec_on_node test@${NODENAME}1 "sh ${RBSCRIPTNAME}"
+    rm ${RBSCRIPTNAME}
 }
 
 clean_gsl() {
     echo $I "############ START clean_gsl" $O
-    exec_on_node test@${NODENAME}1 "rm -f ${RSCRIPTNAME}"
+    exec_on_node test@${NODENAME}1 "rm -f ${RBSCRIPTNAME}"
+    exec_on_node test@${NODENAME}1 "rm -rf ${EXAMPLED}"
 }
 
 
