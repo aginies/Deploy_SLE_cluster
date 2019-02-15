@@ -63,7 +63,7 @@ else
 	echo " ----"
         printenv | grep LMOD_FAMILY_\${TOCHECKV^^}
         printenv | grep LMOD_FAMILY_\${TOCHECKV^^}_VERSION
-        printenv | grep \${TOCHECKV^^}_INC
+        printenv | grep \${TOCHECKV^^}
         module unload \${TOCHECK}
         module unload \${toload}
 fi
