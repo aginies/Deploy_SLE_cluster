@@ -19,21 +19,20 @@ OCRVERSION=1.0.1
 prepare_ocr() {
     echo $I "############ START prepare_ocr" $O
     echo $I "-Install ocr on node ${NODENAME}1" $O
-    exec_on_node ${NODENAME}1 "zypper in -y zypper in ocr-gnu-*"
+    exec_on_node ${NODENAME}1 "zypper in -y ocr-gnu-*"
 }
 
 RSCRIPTNAME=run_ocr.sh
 run_ocr() {
     echo $I "############ START run_ocr" $O
-    exec_on_node test@${NODENAME}1 "cp -af /usr/share/doc/packages/ocr* ~/"
     cat > ${RSCRIPTNAME} <<EOF
 #!/bin/sh
-cd ~/ocr-gnu
+cp -af /usr/share/doc/packages/ocr_1_0_1-gnu-hpc-examples/ ~/ocr-examples
+cd ~/ocr-examples/examples
 module load gnu
-module load ocr/${OCRVERSION}
+module load ocr
 ./ocrTests -all
 "
-    exec_on_node test@${NODENAME}1 "bash -x ${BSCRIPTNAME}"
 EOF
     scp_on_node ${RSCRIPTNAME} "test@${NODENAME}1:~/"
     exec_on_node test@${NODENAME}1 "sh ${RSCRIPTNAME}"
