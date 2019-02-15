@@ -142,7 +142,35 @@ scp_nodes_list() {
     done
     rm -v ${NODESF}
 }
- 
+
+check_value() {
+    # first arg is the username ; second arg must be the file to check
+    USERNAME=$1
+    TMPFILE=$2
+    # if there is more than one uniq line, then there is a diff greping user/group ID on all nodes
+    CHECK=`cat $TMPFILE | uniq | wc -l`
+    if [ "$CHECK" -eq "1" ]; then
+        echo $O "- Same user/group ID for $USERNAME in all nodes" $O
+        else
+        echo $R "- There is no the same ID for $USERNAME user or group in all nodes" $O
+    fi
+}
+
+
+check_user() {
+    echo $I "############ START check_user" $O
+    CM="/tmp/cm"
+    CS="/tmp/cs"
+    for i in `seq 1 $NBNODE`
+    do
+	# grep user and group id on nodes
+        exec_on_node ${NODENAME}${i} "grep slurm /etc/passwd" | grep -v ssh | cut -d ':' -f 3,4 >> $CS
+        exec_on_node ${NODENAME}${i} "grep munge /etc/passwd" | grep -v ssh | cut -d ':' -f 3,4 >> $CM
+    done
+    check_value Slurm $CS
+    check_value Munge $CM
+    rm -f $CS $CM
+} 
 
 create_test_user() {
     echo $I "############ START create_test_user" $O
@@ -180,6 +208,9 @@ case "$1" in
     slurm)
 	slurm_configuration
 	;;
+    checkuser)
+	check_user
+	;;
     ganglia)
 	ganglia_web
 	;;
@@ -209,6 +240,9 @@ case "$1" in
 
  slurm
     configure slurm on all nodes (and enable and start the service)
+
+ checkuser
+    check user/group id for slurm and munge on all nodes
 
  ganglia
     configure apache and get ganglia up
