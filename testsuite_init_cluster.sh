@@ -159,17 +159,14 @@ check_value() {
 
 check_user() {
     echo $I "############ START check_user" $O
-    CM="/tmp/cm"
     CS="/tmp/cs"
     for i in `seq 1 $NBNODE`
     do
 	# grep user and group id on nodes
         exec_on_node ${NODENAME}${i} "grep slurm /etc/passwd" | grep -v ssh | cut -d ':' -f 3,4 >> $CS
-        exec_on_node ${NODENAME}${i} "grep munge /etc/passwd" | grep -v ssh | cut -d ':' -f 3,4 >> $CM
     done
     check_value Slurm $CS
-    check_value Munge $CM
-    rm -f $CS $CM
+    rm -f $CS
 } 
 
 create_test_user() {
