@@ -26,8 +26,10 @@ prepare_script() {
     cat > ${RSCRIPTNAME} <<EOF
 #!/bin/sh
 # first arg should be the lib to check
-if [ -z "\$1" ]; then
- echo "- First arg should be the lib to check! ; second arg should be the VAR PREFIX"
+if [ -z "\$2" ]; then
+ echo "- First arg should be the lib to check! ; Second arg should be the VAR PREFIX to check"
+ echo "ie: \$1 netcdf-cxx4 netcdf"
+ echo "ie: \$1 openmpi opempi"
  echo " Get the list with:
 module available
 "
@@ -50,10 +52,7 @@ do
 	module -t list 
 	printenv | grep LMOD_FAMILY_\${TOCHECKV^^}
 	printenv | grep LMOD_FAMILY_\${TOCHECKV^^}_VERSION
-	printenv | grep \${TOCHECKV^^}_INC
-	printenv | grep \${TOCHECKV^^}_DIR
-	printenv | grep \${TOCHECKV^^}_LIB
-	printenv | grep \${TOCHECKV^^}_BIN
+	printenv | grep \${TOCHECKV^^}
 	module unload \${TOCHECK}
 	module unload \${toload}
 done
@@ -65,9 +64,6 @@ else
         printenv | grep LMOD_FAMILY_\${TOCHECKV^^}
         printenv | grep LMOD_FAMILY_\${TOCHECKV^^}_VERSION
         printenv | grep \${TOCHECKV^^}_INC
-        printenv | grep \${TOCHECKV^^}_DIR
-        printenv | grep \${TOCHECKV^^}_LIB
-        printenv | grep \${TOCHECKV^^}_BIN
         module unload \${TOCHECK}
         module unload \${toload}
 fi
@@ -92,6 +88,8 @@ do
 		vl=fftw
 	elif [ "\$l" == "mvapich2-psm2" ] || [ "\$l" == "mpich-ofi" ] || [ "\$l" == "mvapich2" ] || [ "\$l" == "mpich" ] || [ "\$l" == "openmpi" ] ;then
 		vl=mpi
+	elif [ "\$l" == "netcdf-cxx4" ]; then
+		vl=netcdf
 	else
 		vl=\$l
 	fi
