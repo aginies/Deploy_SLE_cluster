@@ -27,7 +27,7 @@ prepare_script() {
 #!/bin/sh
 # first arg should be the lib to check
 if [ -z "\$1" ]; then
- echo "- First arg should be the lib to check!"
+ echo "- First arg should be the lib to check! ; second arg should be the VAR PREFIX"
  echo " Get the list with:
 module available
 "
@@ -35,6 +35,7 @@ exit 1
 fi
 
 TOCHECK=\$1
+TOCHECKV=\$2
 echo " ############# \${TOCHECK} ##################"
 # find module to load before being able to load the expecte module
 module -t spider \${TOCHECK} | grep gnu | awk -F "gnu/7" '{print \$2}' > /tmp/toload
@@ -47,12 +48,12 @@ do
 	module load \${toload}
 	module load \${TOCHECK}
 	module -t list 
-	printenv | grep LMOD_FAMILY_\${TOCHECK^^}
-	printenv | grep LMOD_FAMILY_\${TOCHECK^^}_VERSION
-	printenv | grep \${TOCHECK^^}_INC
-	printenv | grep \${TOCHECK^^}_DIR
-	printenv | grep \${TOCHECK^^}_LIB
-	printenv | grep \${TOCHECK^^}_BIN
+	printenv | grep LMOD_FAMILY_\${TOCHECKV^^}
+	printenv | grep LMOD_FAMILY_\${TOCHECKV^^}_VERSION
+	printenv | grep \${TOCHECKV^^}_INC
+	printenv | grep \${TOCHECKV^^}_DIR
+	printenv | grep \${TOCHECKV^^}_LIB
+	printenv | grep \${TOCHECKV^^}_BIN
 	module unload \${TOCHECK}
 	module unload \${toload}
 done
@@ -61,12 +62,12 @@ else
 	echo " ---- List of loaded modules:"
 	module -t list 
 	echo " ----"
-        printenv | grep LMOD_FAMILY_\${TOCHECK^^}
-        printenv | grep LMOD_FAMILY_\${TOCHECK^^}_VERSION
-        printenv | grep \${TOCHECK^^}_INC
-        printenv | grep \${TOCHECK^^}_DIR
-        printenv | grep \${TOCHECK^^}_LIB
-        printenv | grep \${TOCHECK^^}_BIN
+        printenv | grep LMOD_FAMILY_\${TOCHECKV^^}
+        printenv | grep LMOD_FAMILY_\${TOCHECKV^^}_VERSION
+        printenv | grep \${TOCHECKV^^}_INC
+        printenv | grep \${TOCHECKV^^}_DIR
+        printenv | grep \${TOCHECKV^^}_LIB
+        printenv | grep \${TOCHECKV^^}_BIN
         module unload \${TOCHECK}
         module unload \${toload}
 fi
@@ -86,7 +87,15 @@ module -t -q avail | cut -d '/' -f 1  | uniq | sed '/^\$/d' > \${LIST}
 
 for l in \`cat \${LIST}\` 
 do
-	sh ./${RSCRIPTNAME} \$l
+	# handle exception ....
+	if [ "\$l" == "fftw3" ]; then
+		vl=fftw
+	elif [ "\$l" == "mvapich2-psm2" ] || [ "\$l" == "mpich-ofi" ] || [ "\$l" == "mvapich2" ] || [ "\$l" == "mpich" ] || [ "\$l" == "openmpi" ] ;then
+		vl=mpi
+	else
+		vl=\$l
+	fi
+	sh ./${RSCRIPTNAME} \$l \$vl
 done
 EOF
     scp_on_node ${SCRIPTNAME} "test@${NODENAME}1:~/"
