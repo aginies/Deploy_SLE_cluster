@@ -106,7 +106,7 @@ nfs_client() {
 	exec_on_node ${NODENAME}${i} "systemctl enable nfs"
 	exec_on_node ${NODENAME}${i} "systemctl start nfs"
 	exec_on_node ${NODENAME}${i} "mkdir /export" IGNORE=1
-	exec_on_node ${NODENAME}${i} "echo '${NODENAME}1:/export	/eport	nfs	noauto,rw,bg,exec,suid,dev,soft,nolock,async 0 0' >> /etc/fstab"
+	exec_on_node ${NODENAME}${i} "echo '${NODENAME}1:/export	/export	nfs	noauto,rw,bg,exec,suid,dev,soft,nolock,async 0 0' >> /etc/fstab"
 	exec_on_node ${NODENAME}${i} "mount ${NODENAME}1:/export /export"
     done
 }
