@@ -17,7 +17,7 @@ check_load_config_file other
 prepare_env() {
     echo $I "############ START prepare_env" $O
     echo $I "-Install all packages on node ${NODENAME}1" $O
-    exec_on_node ${NODENAME}1 "zypper in -y package_list"
+    exec_on_node ${NODENAME}1 "zypper in -y patterns-hpc-development_node patterns-hpc-compute_node patterns-hpc-libraries"
 }
 
 export RSCRIPTNAME=check_env_script.sh
