@@ -49,7 +49,6 @@ do
 	echo " With preloaded \${toload}"
 	module load \${toload}
 done
-else
         module load \${TOCHECK}
 	echo " ---- List of loaded modules:"
 	module -t list 
@@ -59,6 +58,37 @@ else
         printenv | grep \${TOCHECKV^^}
         module unload \${TOCHECK}
         module unload \${toload}
+else
+        module load \${TOCHECK}
+        echo " ---- List of loaded modules:"
+        module -t list
+        echo " ----"
+        printenv | grep LMOD_FAMILY_\${TOCHECKV^^}
+        printenv | grep LMOD_FAMILY_\${TOCHECKV^^}_VERSION
+        printenv | grep \${TOCHECKV^^}
+        TOC=\${TOCHECKV^^}
+        #cd \`printenv \${TOC}\`
+        #echo DEBUG \`printenv \${TOC}\`
+        TOCE=\`printenv \${TOC}_DIR\`
+        if [ -z \`printenv \${TOC}_BIN\` ]; then
+                if [ -d "\$TOCE/bin" ]; then
+                       echo \$F "   !!! Missing \${TOCHECKV^^}_BIN but \${TOCE}/bin present" \$O
+                fi
+        fi
+        if [ -z \`printenv \${TOC}_INC\` ]; then
+               if [ -d "\$TOCE/include" ]; then
+                       echo \$F "   !!! Missing \${TOCHECKV^^}_INC but \${TOCE}/include present" \$O
+               fi
+       fi
+        if [ -z \`printenv \${TOC}_LIB\` ]; then
+               if [ -d "\$TOCE/lib64" ]; then
+                       echo \$F "   !!! Missing \${TOCHECKV^^}_LIB but \${TOCE}/lib64 present" \$O 
+               fi
+       fi
+
+        module unload ${TOCHECK}
+        module unload ${toload}
+
 fi
 EOF
     scp_on_node ${RSCRIPTNAME} "test@${NODENAME}1:~/"
