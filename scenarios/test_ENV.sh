@@ -113,6 +113,8 @@ do
 		vl=mpi
 	elif [ "\$l" == "netcdf-cxx4" ]; then
 		vl=netcdf
+	elif [ "\$l" == "openblas-pthreads" ]; then
+		 vl=openblas
 	else
 		vl=\$l
 	fi
