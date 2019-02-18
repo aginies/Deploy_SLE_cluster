@@ -48,13 +48,6 @@ for toload in \`cat /tmp/toload\`
 do
 	echo " With preloaded \${toload}"
 	module load \${toload}
-	module load \${TOCHECK}
-	module -t list 
-	printenv | grep LMOD_FAMILY_\${TOCHECKV^^}
-	printenv | grep LMOD_FAMILY_\${TOCHECKV^^}_VERSION
-	printenv | grep \${TOCHECKV^^}
-	module unload \${TOCHECK}
-	module unload \${toload}
 done
 else
         module load \${TOCHECK}
