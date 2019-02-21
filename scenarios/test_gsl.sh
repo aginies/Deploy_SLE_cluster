@@ -17,14 +17,14 @@ check_load_config_file other
 prepare_gsl() {
     echo $I "############ START prepare_gsl" $O
     echo $I "-Install gsl on node ${NODENAME}1" $O
-    exec_on_node ${NODENAME}1 "zypper in -y gsl-gnu-hpc* gsl-devel gsl_2_5-gnu-hpc-doc gsl_2_5-gnu-hpc-module gsl_2_5-gnu-hpc-devel"
+    exec_on_node ${NODENAME}1 "zypper in -y gsl-gnu-hpc* gsl-gnu-hpc-devel gsl-*"
 }
 
 RBSCRIPTNAME=build_run_gsl.sh
 EXAMPLED=gsl-examples
 run_gsl() {
     echo $I "############ START run_gsl" $O
-    cat > ${RSCRIPTNAME} <<EOF
+    cat > ${RBSCRIPTNAME} <<EOF
 #!/bin/sh
 EXAMPLED=gsl-examples
 cp -a /usr/share/doc/packages/gsl_2_5-gnu-hpc-examples/examples \${EXAMPLED}
