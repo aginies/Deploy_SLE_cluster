@@ -171,13 +171,15 @@
       <enable config:type="list">
 	<service>display-manager</service>
 	<service>getty@tty7</service>
-	<service>haveged</service>
 	<service>irqbalance</service>
-	<service>iscsi</service>
 	<service>purge-kernels</service>
 	<service>rollback</service>
+<!--
 	<service>rsyslog</service>
+	<service>haveged</service>
+	<service>iscsi</service>
 	<service>smartd</service>
+-->
 	<service>sshd</service>
 	<service>wicked</service>
 	<service>wickedd-auto4</service>
