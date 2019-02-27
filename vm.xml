@@ -339,6 +339,253 @@
           <name>NODENAME9.NODEDOMAIN NODENAME9 FHN9</name>
 	</names>
       </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.110</host_address>
+        <names config:type="list">
+          <name>NODENAME10.NODEDOMAIN NODENAME10 FHN10</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.111</host_address>
+        <names config:type="list">
+          <name>NODENAME11.NODEDOMAIN NODENAME11 FHN11</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.112</host_address>
+        <names config:type="list">
+          <name>NODENAME12.NODEDOMAIN NODENAME12 FHN12</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.113</host_address>
+        <names config:type="list">
+          <name>NODENAME13.NODEDOMAIN NODENAME13 FHN13</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.114</host_address>
+        <names config:type="list">
+          <name>NODENAME14.NODEDOMAIN NODENAME14 FHN14</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.115</host_address>
+        <names config:type="list">
+          <name>NODENAME15.NODEDOMAIN NODENAME15 FHN15</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.116</host_address>
+        <names config:type="list">
+          <name>NODENAME16.NODEDOMAIN NODENAME16 FHN16</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.117</host_address>
+        <names config:type="list">
+          <name>NODENAME17.NODEDOMAIN NODENAME17 FHN17</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.118</host_address>
+        <names config:type="list">
+          <name>NODENAME18.NODEDOMAIN NODENAME18 FHN18</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.119</host_address>
+        <names config:type="list">
+          <name>NODENAME19.NODEDOMAIN NODENAME19 FHN19</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.120</host_address>
+        <names config:type="list">
+          <name>NODENAME20.NODEDOMAIN NODENAME20 FHN20</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.121</host_address>
+        <names config:type="list">
+          <name>NODENAME21.NODEDOMAIN NODENAME21 FHN21</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.122</host_address>
+        <names config:type="list">
+          <name>NODENAME22.NODEDOMAIN NODENAME22 FHN22</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.123</host_address>
+        <names config:type="list">
+          <name>NODENAME23.NODEDOMAIN NODENAME23 FHN23</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.124</host_address>
+        <names config:type="list">
+          <name>NODENAME24.NODEDOMAIN NODENAME24 FHN24</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.125</host_address>
+        <names config:type="list">
+          <name>NODENAME25.NODEDOMAIN NODENAME25 FHN25</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.126</host_address>
+        <names config:type="list">
+          <name>NODENAME26.NODEDOMAIN NODENAME26 FHN26</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.127</host_address>
+        <names config:type="list">
+          <name>NODENAME27.NODEDOMAIN NODENAME27 FHN27</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.128</host_address>
+        <names config:type="list">
+          <name>NODENAME28.NODEDOMAIN NODENAME28 FHN28</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.129</host_address>
+        <names config:type="list">
+          <name>NODENAME29.NODEDOMAIN NODENAME29 FHN29</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.130</host_address>
+        <names config:type="list">
+          <name>NODENAME30.NODEDOMAIN NODENAME30 FHN30</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.131</host_address>
+        <names config:type="list">
+          <name>NODENAME31.NODEDOMAIN NODENAME31 FHN31</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.132</host_address>
+        <names config:type="list">
+          <name>NODENAME32.NODEDOMAIN NODENAME32 FHN32</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.133</host_address>
+        <names config:type="list">
+          <name>NODENAME33.NODEDOMAIN NODENAME33 FHN33</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.134</host_address>
+        <names config:type="list">
+          <name>NODENAME34.NODEDOMAIN NODENAME34 FHN34</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.135</host_address>
+        <names config:type="list">
+          <name>NODENAME35.NODEDOMAIN NODENAME35 FHN35</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.136</host_address>
+        <names config:type="list">
+          <name>NODENAME36.NODEDOMAIN NODENAME36 FHN36</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.137</host_address>
+        <names config:type="list">
+          <name>NODENAME37.NODEDOMAIN NODENAME37 FHN37</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.138</host_address>
+        <names config:type="list">
+          <name>NODENAME38.NODEDOMAIN NODENAME38 FHN38</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.139</host_address>
+        <names config:type="list">
+          <name>NODENAME39.NODEDOMAIN NODENAME39 FHN39</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.140</host_address>
+        <names config:type="list">
+          <name>NODENAME40.NODEDOMAIN NODENAME40 FHN40</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.141</host_address>
+        <names config:type="list">
+          <name>NODENAME41.NODEDOMAIN NODENAME41 FHN41</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.142</host_address>
+        <names config:type="list">
+          <name>NODENAME42.NODEDOMAIN NODENAME42 FHN42</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.143</host_address>
+        <names config:type="list">
+          <name>NODENAME43.NODEDOMAIN NODENAME43 FHN43</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.144</host_address>
+        <names config:type="list">
+          <name>NODENAME44.NODEDOMAIN NODENAME44 FHN44</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.145</host_address>
+        <names config:type="list">
+          <name>NODENAME45.NODEDOMAIN NODENAME45 FHN45</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.146</host_address>
+        <names config:type="list">
+          <name>NODENAME46.NODEDOMAIN NODENAME46 FHN46</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.147</host_address>
+        <names config:type="list">
+          <name>NODENAME47.NODEDOMAIN NODENAME47 FHN47</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.148</host_address>
+        <names config:type="list">
+          <name>NODENAME48.NODEDOMAIN NODENAME48 FHN48</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.149</host_address>
+        <names config:type="list">
+          <name>NODENAME49.NODEDOMAIN NODENAME49 FHN49</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.150</host_address>
+        <names config:type="list">
+          <name>NODENAME50.NODEDOMAIN NODENAME50 FHN50</name>
+        </names>
+     </hosts_entry>
+
     </hosts>
   </host>
   <!--  <sysconfig config:type="list">
