@@ -172,8 +172,6 @@
 	<service>getty@tty1</service>
 	<service>getty@tty7</service>
 	<service>irqbalance</service>
-	<service>mcelog</service>
-	<service>nscd</service>
 	<service>purge-kernels</service>
 	<service>rollback</service>
 <!--	
