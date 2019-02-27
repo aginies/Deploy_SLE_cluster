@@ -36,19 +36,19 @@ ssh_root_key() {
     ssh-keygen -t rsa -f ~/.ssh/${IDRSA} -N ""
     echo "- Create /root/.ssh/config for nodes access"
     CONFIGSSH="/root/.ssh/config"
+    TMPF="/tmp/host_config_CLUSTER"
     grep ${NODENAME}2 $CONFIGSSH
     if [ "$?" -ne "0" ]; then
-	cat >> $CONFIGSSH<<EOF
-host ${NODENAME}1 ${NODENAME}2 ${NODENAME}3 ${NODENAME}4 ${NODENAME}5 ${NODENAME}6 ${NODENAME}7 ${NODENAME}8 ${NODENAME}9
-IdentityFile /root/.ssh/${IDRSA}
-EOF
-	else
+	for i in `seq 1 ${NBNODE}`
+	do
+		echo -n "${NODENAME}${i} " >> ${TMPF}
+	done
+	echo host `cat ${TMPF}` >> $CONFIGSSH
+    	echo "IdentityFile /root/.ssh/${IDRSA}" >> $CONFIGSSH
+    else
 	echo "- seems $CONFIGSSH already contains needed modification"
-	echo "- Should be something like:
-host ${NODENAME}1 ${NODENAME}2 ${NODENAME}3 ${NODENAME}4 ${NODENAME}5 ${NODENAME}6 ${NODENAME}7 ${NODENAME}8 ${NODENAME}9
-IdentityFile /root/.ssh/${IDRSA}
-"
     fi
+    rm -f ${TMPF}
 }
 
 # Connect as root in VMguest without Password, copy root host key
@@ -71,9 +71,15 @@ prepare_etc_hosts() {
     grep ${NODENAME}1.${NODEDOMAIN} /etc/hosts
     if [ $? == "1" ]; then
         echo "- Prepare /etc/hosts (adding nodes)"
+	CURRENT=0
 	for i in `seq 1 $NBNODE`
-		do
+	do
+	    ((++CURRENT))
+	    if [ ${CURRENT} -lt "10" ]; then
 		echo "${NETWORK}.10${i}  ${NODENAME}${i}.${NODEDOMAIN} ${NODENAME}${i}" >> /etc/hosts
+	    else
+		echo "${NETWORK}.1${i}  ${NODENAME}${i}.${NODEDOMAIN} ${NODENAME}${i}" >> /etc/hosts
+	    fi
 	done
     else
         echo "- /etc/hosts already ok"
@@ -95,20 +101,23 @@ prepare_virtual_network() {
   <domain name='${NETWORKNAME}'/>
   <ip address='${NETWORK}.1' netmask='255.255.255.0'>
     <dhcp>
-      <range start='${NETWORK}.128' end='${NETWORK}.254'/>
-      <host mac="${MAC}1" name="${NODENAME}1.${NODEDOMAIN}" ip="${NETWORK}.101" />
-      <host mac="${MAC}2" name="${NODENAME}2.${NODEDOMAIN}" ip="${NETWORK}.102" />
-      <host mac="${MAC}3" name="${NODENAME}3.${NODEDOMAIN}" ip="${NETWORK}.103" />
-      <host mac="${MAC}4" name="${NODENAME}4.${NODEDOMAIN}" ip="${NETWORK}.104" />
-      <host mac="${MAC}5" name="${NODENAME}5.${NODEDOMAIN}" ip="${NETWORK}.105" />
-      <host mac="${MAC}6" name="${NODENAME}6.${NODEDOMAIN}" ip="${NETWORK}.106" />
-      <host mac="${MAC}7" name="${NODENAME}7.${NODEDOMAIN}" ip="${NETWORK}.107" />
-      <host mac="${MAC}7" name="${NODENAME}8.${NODEDOMAIN}" ip="${NETWORK}.108" />
-      <host mac="${MAC}9" name="${NODENAME}9.${NODEDOMAIN}" ip="${NETWORK}.109" />
-    </dhcp>
-  </ip>
-</network>
+      <range start='${NETWORK}.188' end='${NETWORK}.254'/>
 EOF
+    CURRENT=0
+    for i in `seq 1 $NBNODE`
+    do
+	((++CURRENT))
+	if [ ${CURRENT} -lt "10" ]; then
+#	    echo "<host mac=\"${MAC}${NBNODE}\" name=\"${NODENAME}${NBNODE}.${NODEDOMAIN}\" ip=\"${NETWORK}.10${NBNODE}\" />" >> /etc/libvirt/qemu/networks/${NETWORKNAME}.xml
+	    echo "<host name=\"${NODENAME}${CURRENT}.${NODEDOMAIN}\" ip=\"${NETWORK}.10${CURRENT}\" />" >> /etc/libvirt/qemu/networks/${NETWORKNAME}.xml
+	else    
+#	    echo "<host mac=\"${MAC}${NBNODE}\" name=\"${NODENAME}${NBNODE}.${NODEDOMAIN}\" ip=\"${NETWORK}.1${NBNODE}\" />" >> /etc/libvirt/qemu/networks/${NETWORKNAME}.xml
+	    echo "<host name=\"${NODENAME}${CURRENT}.${NODEDOMAIN}\" ip=\"${NETWORK}.1${CURRENT}\" />" >> /etc/libvirt/qemu/networks/${NETWORKNAME}.xml
+	fi
+    done	
+    echo "    </dhcp>
+  </ip>
+</network>" >> /etc/libvirt/qemu/networks/${NETWORKNAME}.xml
 
     echo "- Start ${NETWORKNAME}"
     systemctl restart libvirtd
@@ -152,22 +161,22 @@ prepare_auto_deploy_image() {
     WDIRMOUNT="/mnt/tmp_sle"
     mkdir ${WDIRMOUNT} ${WDIR2}
     cd ${STORAGEP}
-    cp -avf ${WDIR}/${VMXML} ${WDIR2}/${VMXML}
-    cp -avf ${WDIR}/${VMMINIXML} ${WDIR2}/vm_mini.xml
+    cp -avf ${WDIR}/${VMXML} ${WDIR2}/vm.xml
+    cp -avf ${WDIR}/${VMMINIXML} ${WDIR2}/vm2.xml
     sleep 1
-    perl -pi -e "s/NETWORK/${NETWORK}/g" ${WDIR2}/${VMXML}
-    perl -pi -e "s/NODEDOMAIN/${NODEDOMAIN}/g" ${WDIR2}/${VMXML}
-    perl -pi -e "s/NODENAME/${NODENAME}/g" ${WDIR2}/${VMXML}
-    perl -pi -e "s/FHN/${NODENAME}/g" ${WDIR2}/${VMXML}
-    perl -pi -e "s/NETWORK/${NETWORK}/g" ${WDIR2}/${VMMINIXML}
-    perl -pi -e "s/NODEDOMAIN/${NODEDOMAIN}/g" ${WDIR2}/${VMMINIXML}
-    perl -pi -e "s/NODENAME/${NODENAME}/g" ${WDIR2}/${VMMINIXML}
-    perl -pi -e "s/FHN/${NODENAME}/g" ${WDIR2}/${VMMINIXML}
+    perl -pi -e "s/NETWORK/${NETWORK}/g" ${WDIR2}/vm.xml
+    perl -pi -e "s/NODEDOMAIN/${NODEDOMAIN}/g" ${WDIR2}/vm.xml
+    perl -pi -e "s/NODENAME/${NODENAME}/g" ${WDIR2}/vm.xml
+    perl -pi -e "s/FHN/${NODENAME}/g" ${WDIR2}/vm.xml
+    perl -pi -e "s/NETWORK/${NETWORK}/g" ${WDIR2}/vm2.xml
+    perl -pi -e "s/NODEDOMAIN/${NODEDOMAIN}/g" ${WDIR2}/vm2.xml
+    perl -pi -e "s/NODENAME/${NODENAME}/g" ${WDIR2}/vm2.xml
+    perl -pi -e "s/FHN/${NODENAME}/g" ${WDIR2}/vm2.xml
     qemu-img create vm_xml.raw -f raw 2M
     mkfs.ext3 vm_xml.raw
     mount vm_xml.raw ${WDIRMOUNT}
-    cp -v ${WDIR2}/${VMXML} ${WDIRMOUNT}
-    cp -v ${WDIR2}/${VMMINIXML} ${WDIRMOUNT}
+    cp -v ${WDIR2}/vm.xml ${WDIRMOUNT}
+    cp -v ${WDIR2}/vm2.xml ${WDIRMOUNT}
     umount ${WDIRMOUNT}
     rm -rf ${WDIRMOUNT} ${WDIR2}
 }

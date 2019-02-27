@@ -36,8 +36,8 @@ cleanup_vm() {
     echo " press [ENTER] twice OR Ctrl+C to abort"
     read
     read
-#    for nb in `seq 1 $NBNODE`
-    for nb in `seq 1 9`
+    #    for nb in `seq 1 $NBNODE`
+    for nb in `seq 1 ${NBNODE}`
     do 
 	GNAME="${NAME}${nb}"
 	virsh list --all | grep ${GNAME} > /dev/null
@@ -65,14 +65,16 @@ install_vm() {
     if [ ! -f ${VMDISK} ]; then echo "- ${VMDISK} NOT present"; exit 1; fi
     echo "- Start VM guest installation in a screen"
 
+#	   --network network=${NETWORKNAME},mac=${MAC}${ENDNODEMAC} \
+
     screen -d -m -S "install_VM_guest_${NAME}" virt-install --name ${NAME} \
 	   --ram ${RAM} \
 	   --vcpus ${VCPU} \
 	   --virt-type kvm \
 	   --os-variant sles12sp3 \
 	   --controller scsi,model=virtio-scsi \
+	   --network network=${NETWORKNAME} \
 	   --graphics vnc,keymap=${KEYMAP} \
-	   --network network=${NETWORKNAME},mac=${MAC}${ENDNODEMAC} \
 	   --disk path=${VMDISK},format=qcow2,bus=virtio,cache=none \
 	   --disk path=${SHAREDISK},bus=virtio \
 	   --disk path=${DISKVM},bus=virtio \
@@ -134,16 +136,32 @@ install_vm
 
 # install all other VM (minimal autoyast file)
 # Use a minimal installation without X for node2 and node3 etc...
-EXTRAARGS="autoyast=device://vdc/vm_mini.xml"
+EXTRAARGS="autoyast=device://vdc/vm2.xml"
 
+NBOFINSTALLMAX=5
+NBOFINSTALL=0
 for nb in `seq 2 $NBNODE` 
-	do
-	# Install VM 
+do
+    # Install VM
+    ((NBOFINSTALL++))
+    if [ "${NBOFINSTALL}" -lt "${NBOFINSTALLMAX}" ]; then
 	export NAME="${NODENAME}${nb}"
 	export ENDNODEMAC=${nb}
 	export VMDISK="${STORAGEP}/${LIBVIRTPOOL}/${NAME}.qcow2"
 	sleep 5
 	install_vm
+    else
+	echo "- There is currently too many VM installation in progress (${NBOFINSTALLMAX})"
+	echo
+	echo "########################################################################"
+	echo
+	echo " Please [ENTER] twice to relaunch up to ${NBOFINSTALLMAX} installation"
+	echo
+	echo "########################################################################"
+	read
+	read
+	NBOFINSTALL=0
+    fi
 done
 
 # Check VM
