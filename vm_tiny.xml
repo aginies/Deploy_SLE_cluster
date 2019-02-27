@@ -1,0 +1,592 @@
+<?xml version="1.0"?>
+<!DOCTYPE profile>
+<profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
+  <add-on>
+    <add_on_products config:type="list">
+      <listentry>
+        <media_url><![CDATA[dvd:///?devices=/dev/sr0]]></media_url>
+        <product>sle-module-development-tools</product>
+        <product_dir>/Module-Development-Tools</product_dir>
+      </listentry>
+      <listentry>
+        <media_url><![CDATA[dvd:///?devices=/dev/sr0]]></media_url>
+        <product>sle-module-desktop-applications</product>
+        <product_dir>/Module-Desktop-Applications</product_dir>
+      </listentry>
+      <listentry>
+        <media_url><![CDATA[dvd:///?devices=/dev/sr0]]></media_url>
+        <product>sle-module-basesystem</product>
+        <product_dir>/Module-Basesystem</product_dir>
+      </listentry>
+      <listentry>
+        <media_url><![CDATA[dvd:///?devices=/dev/sr0]]></media_url>
+        <product>sle-hpc</product>
+        <product_dir>/Module-HPC</product_dir>
+      </listentry>
+      <listentry>
+        <media_url><![CDATA[dvd:///?devices=/dev/sr0]]></media_url>
+        <product>sle-module-server-applications</product>
+        <product_dir>/Module-Server-Applications</product_dir>
+      </listentry>
+      <listentry>
+        <media_url><![CDATA[dvd:///?devices=/dev/sr0]]></media_url>
+        <product>module-web-scripting</product>
+        <product_dir>/Module-Web-Scripting</product_dir>
+      </listentry>
+    </add_on_products>
+  </add-on>
+  <bootloader>
+    <global>
+      <activate>true</activate>
+      <append>quiet splash=silent splash=silent quiet showopts</append>
+      <boot_boot>true</boot_boot>
+      <boot_extended>false</boot_extended>
+      <boot_mbr>true</boot_mbr>
+      <boot_root>true</boot_root>
+      <generic_mbr>true</generic_mbr>
+      <gfxmode>auto</gfxmode>
+      <hiddenmenu>false</hiddenmenu>
+      <os_prober>false</os_prober>
+      <terminal>gfxterm</terminal>
+      <timeout config:type="integer">8</timeout>
+      <trusted_grub>false</trusted_grub>
+    </global>
+    <loader_type>grub2</loader_type>
+  </bootloader>
+  <kdump>
+    <!-- memory reservation -->
+    <add_crash_kernel config:type="boolean">false</add_crash_kernel>
+  </kdump>
+  <general>
+    <ask-list config:type="list"/>
+    <mode>
+      <confirm config:type="boolean">false</confirm>
+    </mode>
+    <signature-handling/>
+  </general>
+  <deploy_image>
+    <image_installation config:type="boolean">false</image_installation>
+  </deploy_image>
+  <keyboard>
+    <keymap>french</keymap>
+  </keyboard>
+  <login_settings/>
+  <networking>
+    <dhcp_options>
+      <dhclient_client_id/>
+      <dhclient_hostname_option>AUTO</dhclient_hostname_option>
+    </dhcp_options>
+    <dns>
+      <dhcp_hostname config:type="boolean">true</dhcp_hostname>
+      <domain>slenet</domain>
+      <resolv_conf_policy>auto</resolv_conf_policy>
+      <write_hostname config:type="boolean">false</write_hostname>
+    </dns>
+    <interfaces config:type="list">
+      <interface>
+        <bootproto>dhcp</bootproto>
+        <device>eth0</device>
+        <dhclient_set_default_route>yes</dhclient_set_default_route>
+        <startmode>auto</startmode>
+      </interface>
+      <interface>
+        <bootproto>static</bootproto>
+        <device>lo</device>
+        <firewall>no</firewall>
+        <ipaddr>127.0.0.1</ipaddr>
+        <netmask>255.0.0.0</netmask>
+        <network>127.0.0.0</network>
+        <prefixlen>8</prefixlen>
+        <startmode>nfsroot</startmode>
+        <usercontrol>no</usercontrol>
+      </interface>
+    </interfaces>
+    <ipv6 config:type="boolean">true</ipv6>
+    <keep_install_network config:type="boolean">false</keep_install_network>
+    <managed config:type="boolean">false</managed>
+    <net-udev config:type="list">
+      <rule>
+        <name>eth0</name>
+        <rule>KERNELS</rule>
+        <value>0000:00:03.0</value>
+      </rule>
+    </net-udev>
+    <routing>
+      <ipv4_forward config:type="boolean">false</ipv4_forward>
+      <ipv6_forward config:type="boolean">false</ipv6_forward>
+    </routing>
+  </networking>
+  <partitioning config:type="list">
+    <drive>
+      <device>/dev/vda</device>
+      <disklabel>msdos</disklabel>
+      <enable_snapshots config:type="boolean">true</enable_snapshots>
+      <initialize config:type="boolean">true</initialize>
+      <partitions config:type="list">
+        <partition>
+          <create config:type="boolean">true</create>
+          <crypt_fs config:type="boolean">false</crypt_fs>
+          <filesystem config:type="symbol">swap</filesystem>
+          <format config:type="boolean">true</format>
+          <fstopt>defaults</fstopt>
+          <loop_fs config:type="boolean">false</loop_fs>
+          <mount>swap</mount>
+          <mountby config:type="symbol">uuid</mountby>
+          <partition_id config:type="integer">130</partition_id>
+          <partition_nr config:type="integer">1</partition_nr>
+          <resize config:type="boolean">false</resize>
+          <size>2145549824</size>
+        </partition>
+        <partition>
+          <create config:type="boolean">true</create>
+          <crypt_fs config:type="boolean">false</crypt_fs>
+          <filesystem config:type="symbol">ext3</filesystem>
+          <format config:type="boolean">true</format>
+          <fstopt>defaults</fstopt>
+          <loop_fs config:type="boolean">false</loop_fs>
+          <mount>/</mount>
+          <mountby config:type="symbol">uuid</mountby>
+          <partition_id config:type="integer">131</partition_id>
+          <partition_nr config:type="integer">2</partition_nr>
+          <resize config:type="boolean">false</resize>
+          <size>max</size>
+	</partition>
+      </partitions>
+      <pesize/>
+      <type config:type="symbol">CT_DISK</type>
+      <use>all</use>
+    </drive>
+  </partitioning>
+  <!--  <partitioning config:type="list">
+       <drive>
+       <use>all</use>
+       </drive>
+       </partitioning>
+  -->
+  <services-manager>
+    <default_target>graphical</default_target>
+    <services>
+      <disable config:type="list"/>
+      <service>postfix</service>
+      <enable config:type="list">
+	<service>getty@tty1</service>
+	<service>getty@tty7</service>
+	<service>irqbalance</service>
+	<service>mcelog</service>
+	<service>nscd</service>
+	<service>purge-kernels</service>
+	<service>rollback</service>
+<!--	
+	<service>rsyslog</service>
+	<service>haveged</service>
+	<service>iscsi</service>
+	<service>smartd</service>
+-->	
+	<service>sshd</service>
+	<service>wicked</service>
+	<service>wickedd-auto4</service>
+	<service>wickedd-dhcp4</service>
+	<service>wickedd-dhcp6</service>
+	<service>wickedd-nanny</service>
+	<service>YaST2-Firstboot</service>
+	<service>YaST2-Second-Stage</service>
+      </enable>
+    </services>
+  </services-manager>
+  <timezone>
+    <hwclock>UTC</hwclock>
+    <timezone>Europe/Paris</timezone>
+  </timezone>
+  <user_defaults>
+    <expire/>
+    <group>100</group>
+    <groups/>
+    <home>/home</home>
+    <inactive>-1</inactive>
+    <no_groups config:type="boolean">true</no_groups>
+    <shell>/bin/bash</shell>
+    <skel>/etc/skel</skel>
+    <umask>022</umask>
+  </user_defaults>
+  <users config:type="list">
+    <user>
+      <encrypted config:type="boolean">true</encrypted>
+      <fullname>aginies</fullname>
+      <gid>100</gid>
+      <home>/home/aginies</home>
+      <password_settings>
+	<expire/>
+	<flag/>
+	<inact/>
+	<max>99999</max>
+	<min>0</min>
+	<warn>7</warn>
+      </password_settings>
+      <shell>/bin/bash</shell>
+      <uid>1000</uid>
+      <user_password>$6$xY17NdMS0M9R$d3F8dm3B/.T4jhi3n/XWNhyRO9I6HthxdBBMxZ9LCIuKtI3wSVavBW64G86tOAAc0CklvsPViyT9lOuaHxc5L0</user_password>
+      <username>aginies</username>
+    </user>
+    <user>
+      <encrypted config:type="boolean">true</encrypted>
+      <fullname>root</fullname>
+      <gid>0</gid>
+      <home>/root</home>
+      <password_settings>
+	<expire/>
+	<flag/>
+	<inact/>
+	<max/>
+	<min/>
+	<warn/>
+      </password_settings>
+      <shell>/bin/bash</shell>
+      <uid>0</uid>
+      <user_password>$6$Wa9BNOQh5cjJ$0G99sgb1WtqYaCZulBBkPzHrmEj49zumisslpcitXmasNeFj63Yl97w.ODcxhNWix.XWYhbf9BLsnJjNZOdO8/</user_password>
+      <username>root</username>
+    </user>
+  </users>
+  <software>
+    <products config:type="list">
+      <product>SLE_HPC</product>
+    </products>
+    <!--
+	<install_recommended config:type="boolean">false</install_recommended>
+    -->
+    <!--
+	<patterns config:type="list">
+	<pattern>Minimal</pattern>
+	<pattern>gnome-basic</pattern>
+	<pattern>x11</pattern>
+	</patterns>
+    -->
+    <packages config:type="list">
+      <package>openssh</package>
+      <package>zypper</package>
+      <package>vim</package>
+      <!--      <package>ntp</package> -->
+      <package>less</package>
+      <package>iputils</package>
+      <package>autoyast2</package>
+    </packages>
+  </software>
+  <host>
+    <hosts config:type="list">
+      <hosts_entry>
+	<host_address>127.0.0.1</host_address>
+	<names config:type="list">
+          <name>localhost</name>
+	</names>
+      </hosts_entry>
+      <hosts_entry>
+	<host_address>NETWORK.101</host_address>
+	<names config:type="list">
+          <name>NODENAME1.NODEDOMAIN NODENAME1 FHN1</name>
+	</names>
+      </hosts_entry>
+      <hosts_entry>
+	<host_address>NETWORK.102</host_address>
+	<names config:type="list">
+          <name>NODENAME2.NODEDOMAIN NODENAME2 FHN2 </name>
+	</names>
+      </hosts_entry>
+      <hosts_entry>
+	<host_address>NETWORK.103</host_address>
+	<names config:type="list">
+          <name>NODENAME3.NODEDOMAIN NODENAME3 FHN3</name>
+	</names>
+      </hosts_entry>
+      <hosts_entry>
+	<host_address>NETWORK.104</host_address>
+	<names config:type="list">
+          <name>NODENAME4.NODEDOMAIN NODENAME4 FHN4</name>
+	</names>
+      </hosts_entry>
+      <hosts_entry>
+	<host_address>NETWORK.105</host_address>
+	<names config:type="list">
+          <name>NODENAME5.NODEDOMAIN NODENAME5 FHN5</name>
+	</names>
+      </hosts_entry>
+      <hosts_entry>
+	<host_address>NETWORK.106</host_address>
+	<names config:type="list">
+          <name>NODENAME6.NODEDOMAIN NODENAME6 FHN6</name>
+	</names>
+      </hosts_entry>
+      <hosts_entry>
+	<host_address>NETWORK.107</host_address>
+	<names config:type="list">
+          <name>NODENAME7.NODEDOMAIN NODENAME7 FHN7</name>
+	</names>
+      </hosts_entry>
+      <hosts_entry>
+	<host_address>NETWORK.108</host_address>
+	<names config:type="list">
+          <name>NODENAME8.NODEDOMAIN NODENAME8 FHN8</name>
+	</names>
+      </hosts_entry>
+      <hosts_entry>
+	<host_address>NETWORK.109</host_address>
+	<names config:type="list">
+          <name>NODENAME9.NODEDOMAIN NODENAME9 FHN9</name>
+	</names>
+      </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.110</host_address>
+        <names config:type="list">
+          <name>NODENAME10.NODEDOMAIN NODENAME10 FHN10</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.111</host_address>
+        <names config:type="list">
+          <name>NODENAME11.NODEDOMAIN NODENAME11 FHN11</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.112</host_address>
+        <names config:type="list">
+          <name>NODENAME12.NODEDOMAIN NODENAME12 FHN12</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.113</host_address>
+        <names config:type="list">
+          <name>NODENAME13.NODEDOMAIN NODENAME13 FHN13</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.114</host_address>
+        <names config:type="list">
+          <name>NODENAME14.NODEDOMAIN NODENAME14 FHN14</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.115</host_address>
+        <names config:type="list">
+          <name>NODENAME15.NODEDOMAIN NODENAME15 FHN15</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.116</host_address>
+        <names config:type="list">
+          <name>NODENAME16.NODEDOMAIN NODENAME16 FHN16</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.117</host_address>
+        <names config:type="list">
+          <name>NODENAME17.NODEDOMAIN NODENAME17 FHN17</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.118</host_address>
+        <names config:type="list">
+          <name>NODENAME18.NODEDOMAIN NODENAME18 FHN18</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.119</host_address>
+        <names config:type="list">
+          <name>NODENAME19.NODEDOMAIN NODENAME19 FHN19</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.120</host_address>
+        <names config:type="list">
+          <name>NODENAME20.NODEDOMAIN NODENAME20 FHN20</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.121</host_address>
+        <names config:type="list">
+          <name>NODENAME21.NODEDOMAIN NODENAME21 FHN21</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.122</host_address>
+        <names config:type="list">
+          <name>NODENAME22.NODEDOMAIN NODENAME22 FHN22</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.123</host_address>
+        <names config:type="list">
+          <name>NODENAME23.NODEDOMAIN NODENAME23 FHN23</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.124</host_address>
+        <names config:type="list">
+          <name>NODENAME24.NODEDOMAIN NODENAME24 FHN24</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.125</host_address>
+        <names config:type="list">
+          <name>NODENAME25.NODEDOMAIN NODENAME25 FHN25</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.126</host_address>
+        <names config:type="list">
+          <name>NODENAME26.NODEDOMAIN NODENAME26 FHN26</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.127</host_address>
+        <names config:type="list">
+          <name>NODENAME27.NODEDOMAIN NODENAME27 FHN27</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.128</host_address>
+        <names config:type="list">
+          <name>NODENAME28.NODEDOMAIN NODENAME28 FHN28</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.129</host_address>
+        <names config:type="list">
+          <name>NODENAME29.NODEDOMAIN NODENAME29 FHN29</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.130</host_address>
+        <names config:type="list">
+          <name>NODENAME30.NODEDOMAIN NODENAME30 FHN30</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.131</host_address>
+        <names config:type="list">
+          <name>NODENAME31.NODEDOMAIN NODENAME31 FHN31</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.132</host_address>
+        <names config:type="list">
+          <name>NODENAME32.NODEDOMAIN NODENAME32 FHN32</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.133</host_address>
+        <names config:type="list">
+          <name>NODENAME33.NODEDOMAIN NODENAME33 FHN33</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.134</host_address>
+        <names config:type="list">
+          <name>NODENAME34.NODEDOMAIN NODENAME34 FHN34</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.135</host_address>
+        <names config:type="list">
+          <name>NODENAME35.NODEDOMAIN NODENAME35 FHN35</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.136</host_address>
+        <names config:type="list">
+          <name>NODENAME36.NODEDOMAIN NODENAME36 FHN36</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.137</host_address>
+        <names config:type="list">
+          <name>NODENAME37.NODEDOMAIN NODENAME37 FHN37</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.138</host_address>
+        <names config:type="list">
+          <name>NODENAME38.NODEDOMAIN NODENAME38 FHN38</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.139</host_address>
+        <names config:type="list">
+          <name>NODENAME39.NODEDOMAIN NODENAME39 FHN39</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.140</host_address>
+        <names config:type="list">
+          <name>NODENAME40.NODEDOMAIN NODENAME40 FHN40</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.141</host_address>
+        <names config:type="list">
+          <name>NODENAME41.NODEDOMAIN NODENAME41 FHN41</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.142</host_address>
+        <names config:type="list">
+          <name>NODENAME42.NODEDOMAIN NODENAME42 FHN42</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.143</host_address>
+        <names config:type="list">
+          <name>NODENAME43.NODEDOMAIN NODENAME43 FHN43</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.144</host_address>
+        <names config:type="list">
+          <name>NODENAME44.NODEDOMAIN NODENAME44 FHN44</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.145</host_address>
+        <names config:type="list">
+          <name>NODENAME45.NODEDOMAIN NODENAME45 FHN45</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.146</host_address>
+        <names config:type="list">
+          <name>NODENAME46.NODEDOMAIN NODENAME46 FHN46</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.147</host_address>
+        <names config:type="list">
+          <name>NODENAME47.NODEDOMAIN NODENAME47 FHN47</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.148</host_address>
+        <names config:type="list">
+          <name>NODENAME48.NODEDOMAIN NODENAME48 FHN48</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.149</host_address>
+        <names config:type="list">
+          <name>NODENAME49.NODEDOMAIN NODENAME49 FHN49</name>
+        </names>
+     </hosts_entry>
+     <hosts_entry>
+        <host_address>NETWORK.150</host_address>
+        <names config:type="list">
+          <name>NODENAME50.NODEDOMAIN NODENAME50 FHN50</name>
+        </names>
+     </hosts_entry>
+
+    </hosts>
+  </host>
+  <!--  <sysconfig config:type="list">
+       <sysconfig_entry>
+       <sysconfig_key>SBD_DEVICE</sysconfig_key>
+       <sysconfig_path>/etc/sysconfig/sbd</sysconfig_path>
+       <sysconfig_value>/dev/vdb</sysconfig_value>
+       </sysconfig_entry>
+       </sysconfig>
+  -->
+</profile>
