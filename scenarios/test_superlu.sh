@@ -19,7 +19,7 @@ SUPERLUVERSION=5.2.1
 prepare_superlu() {
     echo $I "############ START prepare_superlu" $O
     echo $I "-Install superlu on node ${NODENAME}1" $O
-    exec_on_node ${NODENAME}1 "zypper in -y libsuperlu-gnu-hpc"
+    exec_on_node ${NODENAME}1 "zypper in -y libsuperlu-gnu-hpc superlu-gnu-hpc-examples make"
 }
 
 BSCRIPTNAME=build_superlu.sh
@@ -29,10 +29,12 @@ build_examples() {
     exec_on_node test@${NODENAME}1 "cat > ${BSCRIPTNAME} <<EOF
 #!/bin/sh
 cd ~/superlu_5_?_?-gnu-hpc-examples/examples/
+mv make.inc ../
 module load gnu
 module load superlu/${SUPERLUVERSION}
 make
 "
+EOF
     exec_on_node test@${NODENAME}1 "bash -x ${BSCRIPTNAME}"
     
 }
