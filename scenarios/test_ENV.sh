@@ -139,7 +139,7 @@ clean_env() {
 ##########################
 ##########################
 
-echo $I "############ METIS ENV SCENARIO #############"
+echo $I "############ TEST ENV SCENARIO #############"
 echo
 echo $O
 #echo " press [ENTER] twice OR Ctrl+C to abort"
