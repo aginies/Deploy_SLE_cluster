@@ -133,44 +133,37 @@ check_before_install
 NAME="${NODENAME}1"
 VMDISK="${STORAGEP}/${LIBVIRTPOOL}/${NAME}.qcow2"
 MAC=`(echo ${NODENAME}${nb}|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
-install_vm ${MAC}
+#install_vm ${MAC}
 
 # install all other VM (minimal autoyast file)
 # Use a minimal installation without X for node2 and node3 etc...
 EXTRAARGS="autoyast=device://vdc/vm2.xml"
 
-NBOFINSTALLMAX=5
-NBOFINSTALL=0
 for nb in `seq 2 $NBNODE` 
 do
     # Install VM
-    ((NBOFINSTALL++))
-    if [ "${NBOFINSTALL}" -lt "${NBOFINSTALLMAX}" ]; then
 	export NAME="${NODENAME}${nb}"
 	export VMDISK="${STORAGEP}/${LIBVIRTPOOL}/${NAME}.qcow2"
         MAC=`(echo ${NODENAME}${nb}|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
 	grep ${MAC} /etc/libvirt/qemu/networks/${NETWORKNAME}.xml
 	if [ "$?" -ne "0" ]; then 
-		echo "!!!! ${MAC} is missing from /etc/libvirt/qemu/networks/${NETWORKNAME}.xml !!!"
-		echo "!!!! EXPECT error in IP or Hostname for node ${NODENAME}${nb}"
+		echo
+		echo " !!!! ${MAC} is missing from /etc/libvirt/qemu/networks/${NETWORKNAME}.xml !!!"
+		echo " !!!! EXPECT error in IP or Hostname for node ${NODENAME}${nb}"
 		echo
 		echo " 		PRESS ENTER TO CONTINUE"
 		read
 	fi
 	install_vm ${MAC}
-	sleep 5
-    else
-	echo "- There is currently too many VM installation in progress (${NBOFINSTALLMAX})"
 	echo
 	echo "########################################################################"
 	echo
-	echo " Please [ENTER] twice to relaunch up to ${NBOFINSTALLMAX} installation"
+	echo " Please [ENTER] twice to launch another install of VM"
+	echo "  (Next VM will be ${NODENAME}${nb})"
 	echo
 	echo "########################################################################"
 	read
 	read
-	NBOFINSTALL=0
-    fi
 done
 
 # Check VM
