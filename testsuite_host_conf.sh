@@ -107,7 +107,6 @@ EOF
     for i in `seq 1 $NBNODE`
     do
 	((++CURRENT))
-	end=$( for i in {1..6} ; do echo -n ${hexchars:$(( $RANDOM % 16 )):1} ; done | sed -e 's/\(..\)/-\1/g' )
 	MAC=`(echo ${NODENAME}${CURRENT}|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
 	if [ ${CURRENT} -lt "10" ]; then
 	    echo "<host mac=\"${MAC}\" name=\"${NODENAME}${CURRENT}.${NODEDOMAIN}\" ip=\"${NETWORK}.10${CURRENT}\" />" >> /etc/libvirt/qemu/networks/${NETWORKNAME}.xml

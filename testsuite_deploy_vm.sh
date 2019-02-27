@@ -57,6 +57,8 @@ cleanup_vm() {
 # Install VM 1
 install_vm() {
     echo $I "############ START install_vm #############" $O
+    # FIRST ARG MUST BE the MAC address
+    MAC=$1
     # pool refresh to avoid error
     virsh pool-refresh ${LIBVIRTPOOL}
     echo "- Create new VM guest image file: ${NAME}.qcow2 ${IMAGESIZE}"
@@ -65,7 +67,6 @@ install_vm() {
     if [ ! -f ${VMDISK} ]; then echo "- ${VMDISK} NOT present"; exit 1; fi
     echo "- Start VM guest installation in a screen"
 
-#	   --network network=${NETWORKNAME},mac=${MAC}${ENDNODEMAC} \
 
     screen -d -m -S "install_VM_guest_${NAME}" virt-install --name ${NAME} \
 	   --ram ${RAM} \
@@ -73,7 +74,7 @@ install_vm() {
 	   --virt-type kvm \
 	   --os-variant sles12sp3 \
 	   --controller scsi,model=virtio-scsi \
-	   --network network=${NETWORKNAME} \
+	   --network network=${NETWORKNAME},mac=${MAC} \
 	   --graphics vnc,keymap=${KEYMAP} \
 	   --disk path=${VMDISK},format=qcow2,bus=virtio,cache=none \
 	   --disk path=${SHAREDISK},bus=virtio \
@@ -130,9 +131,9 @@ check_before_install
 
 # Install VM 1
 NAME="${NODENAME}1"
-ENDNODEMAC="1"
 VMDISK="${STORAGEP}/${LIBVIRTPOOL}/${NAME}.qcow2"
-install_vm
+MAC=`(echo ${NODENAME}${nb}|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
+install_vm ${MAC}
 
 # install all other VM (minimal autoyast file)
 # Use a minimal installation without X for node2 and node3 etc...
@@ -146,10 +147,18 @@ do
     ((NBOFINSTALL++))
     if [ "${NBOFINSTALL}" -lt "${NBOFINSTALLMAX}" ]; then
 	export NAME="${NODENAME}${nb}"
-	export ENDNODEMAC=${nb}
 	export VMDISK="${STORAGEP}/${LIBVIRTPOOL}/${NAME}.qcow2"
+        MAC=`(echo ${NODENAME}${nb}|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
+	grep ${MAC} /etc/libvirt/qemu/networks/${NETWORKNAME}.xml
+	if [ "$?" -ne "0" ]; then 
+		echo "!!!! ${MAC} is missing from /etc/libvirt/qemu/networks/${NETWORKNAME}.xml !!!"
+		echo "!!!! EXPECT error in IP or Hostname for node ${NODENAME}${nb}"
+		echo
+		echo " 		PRESS ENTER TO CONTINUE"
+		read
+	fi
+	install_vm ${MAC}
 	sleep 5
-	install_vm
     else
 	echo "- There is currently too many VM installation in progress (${NBOFINSTALLMAX})"
 	echo
