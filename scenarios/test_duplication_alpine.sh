@@ -34,15 +34,16 @@ check_load_config_file other
 
 
 CLUSTER="duplication"
-STORAGEP="/mnt/data/libvirt/images/duplication"
+STORAGEP="/var/lib/libvirt/images/duplication"
+IMAGESPATH="nodes_images"
 IDRSA="id_rsa_DUPLICATION"
 
 UUID="951e50f1-db73-475a-895f-34562baf8e8f"
 NODEDOMAIN="duplication.com"
 NETWORKNAME="duplication"
 NETWORK="192.168.222"
-NETMACHOST="52:54:00:89:b0:C9"
-BRIDGE="vibr2"
+NETMACHOST="e4:b9:7a:7b:bf:df"
+BRIDGE="vibr0"
 
 NODENAME="alpine"
 DEVNAME="vdb"
@@ -167,6 +168,9 @@ run_server_dup() {
   echo $I "############ START run_server_dup" $O
   echo $I "- Start server on node ${NODENAME}1" $O
   echo "ssh ${NODENAME}1 \"screen -d -m /root/dolly -s -v -o /root/dolly.log -f /etc/dolly.cfg\""
+  echo " PRESS ENTER TWICE TO LAUNCH IT"
+  read
+  read
   ssh ${NODENAME}1 "screen -d -m /root/dolly -s -v -f /etc/dolly.cfg"
 }
 
@@ -217,8 +221,8 @@ clone_vm() {
     for i in `seq 2 $NBNODE`
     do
 	MAC=`(echo ${NODENAME}${i}|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
-	echo "- ${NODENAME}${i} ${STORAGEP}/nodes_images/${NODENAME}${i} ${MAC}"
-	virt-clone --original ${NODENAME}1 --name ${NODENAME}${i} --file ${STORAGEP}/nodes_images/${NODENAME}${i}.qcow2 --mac ${MAC}
+	echo "- ${NODENAME}${i} ${STORAGEP}/${IMAGESPATH}/${NODENAME}${i} ${MAC}"
+	virt-clone --original ${NODENAME}1 --name ${NODENAME}${i} --file ${STORAGEP}/${IMAGESPATH}/${NODENAME}${i}.qcow2 --mac ${MAC}
     done
 }
 
@@ -234,7 +238,7 @@ delete_vm() {
 	echo "- Undefine ${NODENAME}${i}"
 	virsh undefine ${NODENAME}${i}
 	echo "- Deleting storage for ${NODENAME}${i}"
-	rm -v ${STORAGEP}/nodes_images/${NODENAME}${i}.qcow2
+	rm -v ${STORAGEP}/${IMAGESPATH}/${NODENAME}${i}.qcow2
     done
 }
 
@@ -324,6 +328,15 @@ detach_dev_from_node() {
     done
 }
 
+cmd_on_nodes() {
+    echo $I "############ START cmd" $O
+    if [ -z "$1" ]; then echo "- First arg must be the command!"; exit 1; fi
+    CMD="$1"
+    for i in `seq 1 $NBNODE`
+    do
+        exec_on_node ${NODENAME}${i} "$CMD"
+    done
+}
 
 list_devices() {
     echo $I "############ START list_devices" $O
@@ -418,6 +431,9 @@ case $1 in
     list)
 	list_devices
 	;;
+    cmd)
+	cmd_on_nodes $2
+	;;
     detach)
 	detach_dev_from_node
 	;;
@@ -457,7 +473,7 @@ Number of nodes to deploy (clone of node1): ${NBNODE}
 INFO : Default root pass on Alpine VM is empty
 ################################################
 
-usage of $0 {prepare|ssh|clone|etchosts|fixhost|virtualnet|pool|device|format|config|deletepool|start|stop|runs|runc|list|deletevm|all}
+usage of $0 {prepare|cmd|ssh|clone|etchosts|fixhost|virtualnet|pool|device|format|config|deletepool|start|stop|runs|runc|list|deletevm|all}
 
  prepare (no mandatory)
 	copy dolly on all nodes (no needed with alpine VM)
@@ -479,7 +495,7 @@ usage of $0 {prepare|ssh|clone|etchosts|fixhost|virtualnet|pool|device|format|co
  
  deletevm (to restart from scratch)
 	delete all VM (NOT the ${NODENAME}1!)
-	deleta also the image file (${STORAGEP}/nodes_images/${NODENAME}X)
+	deleta also the image file (${STORAGEP}/${IMAGESPATH}/${NODENAME}X)
 
  start
 	start all VM
@@ -510,6 +526,9 @@ usage of $0 {prepare|ssh|clone|etchosts|fixhost|virtualnet|pool|device|format|co
 
  deletepool
 	delete the pool storage
+
+ cmd
+ 	execute a command on all node (first arg)
 
  runs
 	run dolly server on node ${NODENAME}1
