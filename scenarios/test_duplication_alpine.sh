@@ -163,11 +163,15 @@ prepare_duplication() {
     done
 }
 
+run_server_dup() {
+  echo $I "############ START run_server_dup" $O
+  echo $I "- Start server on node ${NODENAME}1" $O
+  echo "ssh ${NODENAME}1 \"screen -d -m /root/dolly -s -v -o /root/dolly.log -f /etc/dolly.cfg\""
+  ssh ${NODENAME}1 "screen -d -m /root/dolly -s -v -f /etc/dolly.cfg"
+}
+
 run_duplication() {
    echo $I "############ START run_duplication" $O
-   echo $I "- Start server on node ${NODENAME}1" $O
-   echo "ssh ${NODENAME}1 \"screen -d -m /root/dolly -s -v -o /root/dolly.log -f /etc/dolly.cfg\""
-   ssh ${NODENAME}1 "screen -d -m /root/dolly -s -v -f /etc/dolly.cfg"
    echo $I "- Start client on all other nodes" $O
    for i in `seq 2 $NBNODE`
    do
@@ -393,7 +397,10 @@ case $1 in
     virtualnet)
         prepare_virtual_network
         ;;
-    run)
+    runs)
+	run_server_dup
+	;;
+    runc)
 	run_duplication
 	;;
     pool)
@@ -450,7 +457,7 @@ Number of nodes to deploy (clone of node1): ${NBNODE}
 INFO : Default root pass on Alpine VM is empty
 ################################################
 
-usage of $0 {prepare|ssh|clone|etchosts|fixhost|virtualnet|pool|device|format|config|deletepool|start|stop|run|list|deletevm|all}
+usage of $0 {prepare|ssh|clone|etchosts|fixhost|virtualnet|pool|device|format|config|deletepool|start|stop|runs|runc|list|deletevm|all}
 
  prepare (no mandatory)
 	copy dolly on all nodes (no needed with alpine VM)
@@ -504,8 +511,11 @@ usage of $0 {prepare|ssh|clone|etchosts|fixhost|virtualnet|pool|device|format|co
  deletepool
 	delete the pool storage
 
- run
-	run the test (WIP)
+ runs
+	run dolly server on node ${NODENAME}1
+
+ runc
+	run dolly client on all nodes the test
 
 "
 	;;
