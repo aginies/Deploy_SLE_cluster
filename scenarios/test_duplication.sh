@@ -20,7 +20,7 @@ else
 fi
 check_load_config_file other
 
-DEVNAME="vdf"
+DEVNAME="vdd"
 diskname="disk"
 CLUSTERDUP="CLUSTERDUP"
 TESTDIR="/mnt/test/"
@@ -31,7 +31,7 @@ IMAGENB=${NBNODE}
 # BIG CLUSTER CONFIG !
 #IMAGENB=30
 #NODENAME=dolly
-#NBNODE=30
+NBNODE=10
 #
 
 prepare_duplication() {
@@ -49,27 +49,29 @@ prepare_duplication() {
 run_duplication() {
    echo $I "############ START run_duplication" $O
    echo $I "- Start server on node ${NODENAME}1" $O
-   exec_on_node ${NODENAME}1 "screen -S dollyServer \"dolly -v -s -f /etc/dolly.cfg\""
+   #exec_on_node ${NODENAME}1 "screen -S dollyServer \"dolly -v -s -f /etc/dolly.cfg\""
    echo $I "- Start client on all other nodes" $O
    for i in `seq 2 $NBNODE`
    do
-	exec_on_node ${NODENAME}${i} "screen -S dollyClient \"dolly -v -f /etc/dolly.cfg\""
+	echo "ssh ${NODENAME}${i} \"dolly -v -f /etc/dolly.cfg\""
+	#exec_on_node ${NODENAME}${i} "screen -S dollyClient \"dolly -v -f /etc/dolly.cfg\""
    done
 }
 
 config_set() {
    echo $I "############ START config_set" $O
+   CLIENTS=`echo $((${NBNODE}-1))`
    cat > dolly.cfg <<EOF
 infile /dev/${DEVNAME}
 outfile /dev/${DEVNAME}
 server ${NODENAME}1
-firstclient ${NODENAME}1
+firstclient ${NODENAME}2
 lastclient ${NODENAME}${NBNODE}
-clients ${NBNODE}"
+clients ${CLIENTS}
 EOF
 for i in `seq 2 $NBNODE`
 do
-echo "${NODENAME}${NBNODE}" >> dolly.cfg
+echo "${NODENAME}${i}" >> dolly.cfg
 done
 echo "endconfig" >> dolly.cfg
 
@@ -77,6 +79,10 @@ echo "endconfig" >> dolly.cfg
 	do
 		scp_on_node dolly.cfg "root@${NODENAME}${i}:/etc/"
 	done
+	echo "- CONFIGURATION:"
+	echo "################"
+	cat dolly.cfg
+	echo "################"
 	rm dolly.cfg
 }
 
@@ -142,7 +148,7 @@ list_devices() {
    for i in `seq 1 $NBNODE`
    do
 	echo "- Devices on node ${NODENAME} ${i}"
-	exec_on_node ${NODENAME}${i} "fdisk -l | grep \"^/dev\""
+	exec_on_node ${NODENAME}${i} "fdisk -l | grep \"^Disk /dev\""
    done
 }
 
@@ -223,7 +229,7 @@ usage of $0 {prepare|pool|device|format|config|deletepool|run|list|all}
  config
 	prepare the config file
 
-  list
+ list
 	list all devices on all nodes
 
  detach
