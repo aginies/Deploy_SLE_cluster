@@ -8,12 +8,15 @@
 #
 # USE https://wiki.alpinelinux.org/wiki/Installation
 # image: https://www.alpinelinux.org/downloads/ (choose virt one)
-# sshd: 
+## SSHD: /etc/ssh/sshd_config
 # PermitRootLogin yes
 # PermitEmptyPasswords yes
-# /etc/init.d/sshd restart
+# /etc/inut.d/sshd restart
+## SERVICE:
+# chmod 644 /etc/init.d/chronyd
+# chmod 644 /etc/init.d/crond
 #
-# install package to be able to build dolly:
+## Install package to be able to build dolly:
 # apk add build-base
 #
 
