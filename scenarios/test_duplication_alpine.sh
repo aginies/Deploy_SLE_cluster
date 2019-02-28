@@ -349,7 +349,7 @@ list_devices() {
 
 format_device() {
     echo $I "############ START format_device" $O
-    echo $I "- Format /dev/${DEVNAME} in ext4 and store some date" $0
+    echo $I "- Format /dev/${DEVNAME} in ext4 and store some date" $O
     exec_on_node ${NODENAME}1 "mkfs.ext4 -v /dev/${DEVNAME}"
     exec_on_node ${NODENAME}1 "mkdir -p ${TESTDIR}" IGNORE=1
     exec_on_node ${NODENAME}1 "mount /dev/${DEVNAME} ${TESTDIR}"
@@ -358,10 +358,10 @@ format_device() {
     exec_on_node ${NODENAME}1 "dd if=/dev/zero of=${TESTDIR}/data200M bs=1M count=200"
     exec_on_node ${NODENAME}1 "dd if=/dev/zero of=${TESTDIR}/data68M bs=1M count=68"
     exec_on_node ${NODENAME}1 "sync"
-    echo $I "- Do some checksum to test after" $0
+    echo $I "- Do some checksum to test after" $O
     exec_on_node ${NODENAME}1 "cd ${TESTDIR} && sha256sum data* > TOCHECK"
     exec_on_node ${NODENAME}1 "cd ${TESTDIR} && cat TOCHECK"
-    echo $I "- Umount ${TESTDIR}" $0
+    echo $I "- Umount ${TESTDIR}" $O
     exec_on_node ${NODENAME}1 "umount ${TESTDIR}"
 }
 
