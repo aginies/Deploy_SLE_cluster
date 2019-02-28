@@ -53,7 +53,7 @@ TESTDIR="/mnt/test"
 SIZEM="512"
 
 # BIG CLUSTER CONFIG !
-NBNODE=4
+NBNODE=35
 IMAGENB=${NBNODE}
 
 
@@ -230,7 +230,7 @@ delete_vm() {
 	echo "- Undefine ${NODENAME}${i}"
 	virsh undefine ${NODENAME}${i}
 	echo "- Deleting storage for ${NODENAME}${i}"
-	rm -v ${STORAGEP}/nodes_images/${NODENAME}${i}
+	rm -v ${STORAGEP}/nodes_images/${NODENAME}${i}.qcow2
     done
 }
 
