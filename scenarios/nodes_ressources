@@ -1,0 +1,121 @@
+#!/bin/sh
+#########################################################
+#
+#
+#########################################################
+## NODES RESSOURCES
+#########################################################
+
+if [ -f ../functions ] ; then
+    . ../functions
+else
+    echo "! functions file needed! ; Exiting"
+    exit 1
+fi
+check_load_config_file other
+
+
+# SOME VARS
+NODEA="${NODENAME}1"
+NODEB="${NODENAME}2"
+MNTTEST="/mnt/test"
+IPA=`grep ${NODEA} /var/lib/libvirt/dnsmasq/${NETWORKNAME}.hostsfile | cut -d , -f 2`
+IPB=`grep ${NODEB} /var/lib/libvirt/dnsmasq/${NETWORKNAME}.hostsfile | cut -d , -f 2`
+
+
+create_vol_name() {
+    echo $I "############ START create_vol_name" $O
+    if [ $# -ne 3 ]; then echo $F "- create_vol_name needs 3args: NODE / POOL_NAME / VOL_NAME" $O ; exit 1; fi
+    NODE="$1"
+    POOLNAME="$2"
+    VOLNAME="$3"
+    echo $I "- Create volume for device using ${POOLNAME} on ${NODE}" $O
+    virsh vol-create-as --pool ${POOLNAME} --name ${VOLNAME}.qcow2 --format qcow2 --capacity 1G --allocation 1G --prealloc-metadata
+    virsh vol-list ${POOLNAME} --details
+    virsh pool-refresh --pool ${POOLNAME}
+}
+
+delete_vol_name() {
+    if [ $# -ne 3 ]; then echo $F "- delete_vol_name needs 3args: NODE / POOL_NAME / VOL_NAME" $O ; exit 1; fi
+    NODE="$1"
+    POOLNAME="$2"
+    VOLNAME="$3"
+    echo $I "############ START delete_vol_name" $O
+    echo $W "- Delete volume ${VOLNAME} ${POOLNAME} on ${NODE}" $O
+    virsh vol-delete --pool ${POOLNAME} ${VOLNAME}.qcow2
+}
+
+delete_pool_name() {
+    echo $I "############ START delete_pool_name" $O
+    if [ $# -ne 1 ]; then echo $F "- delete_pool_name needs one arg: POOL_NAME" $O; exit 1; fi
+    POOLNAME="$1"
+    echo $W "- Delete pool ${POOLNAME}" $O
+    virsh pool-destroy ${POOLNAME}
+    virsh pool-undefine ${POOLNAME}
+    echo $W "- Delete path to volume ${STORAGEP}/${POOLNAME}" $O
+    rm -rf ${STORAGEP}/${POOLNAME}
+}
+
+attach_disk_to_node() {
+    echo $I "############ START attach_disk_to_node" $O
+    NODE="$1"
+    POOLNAME="$2"
+    VOLNAME="$3"
+    TARGETVD="$4"
+    EXT="$5"
+    if [ $# -ne 5 ]; then echo $F "- attach_disk_to_node needs 4args: NODE / POOL_NAME / VOL_NAME / TARGET VD / EXTENSION" $O ; exit 1; fi
+    echo $I "- Attach volume ${POOLNAME} to ${NODE}, target is ${TARGETVD}" $O
+    virsh attach-disk ${NODE} --live --cache none ${STORAGEP}/${POOLNAME}/${VOLNAME}.${EXT} --target ${TARGETVD}
+    #exec_on_node ${NODE} "parted --script /dev/${TARGETVD} print ; echo \$? > /tmp/CODE"
+    exec_on_node ${NODE} "ls -la /dev/${TARGETVD} ; echo \$? > /tmp/CODE"
+    scp -q -o StrictHostKeyChecking=no ${NODE}:/tmp/CODE /tmp/CODE
+    VALUE=`cat /tmp/CODE`
+    if [ $VALUE -eq 0 ]; then
+	echo $I "- Target is /dev/${TARGETVD} (as expected)" $O
+    else
+        echo $F "- Target should be /dev/${TARGETVD}, this is not the case" $O
+        echo $F "! The ONLY WAY to fix this is to reboot the node $1" $O
+        echo $F "-  # PRESS [ENTER] TO CONTINUE #" $0
+        read
+    fi
+}
+
+check_targetvd_on_node() {
+    echo $I "############ START check_targetvd_on_node" $O
+    # workaround as this is not possible to garantee target device on VM guest
+    if [ $# -ne 3 ]; then echo $F "- check_targetvd_on_node needs 3arg: NODE_NAME / TARGET_VD / START_LETTER" $O ; exit 1; fi
+    NODE="$1"
+    TARGETVD="$2"
+    STARTLETTER="$3"
+    exec_on_node ${NODE} "ls -la /dev/${TARGETVD} ; echo \$? > /tmp/CODE"
+    scp -q -o StrictHostKeyChecking=no ${NODE}:/tmp/CODE /tmp/CODE
+    VALUE=`cat /tmp/CODE`
+    if [ $VALUE -eq 0 ]; then
+	export REALTARGETVD=${TARGETVD}
+    else
+	for LETTER in {${STARTLETTER}..z}; do
+	    #echo "- Testing /dev/vd${LETTER}"
+	    export REALTARGETVD="vd${LETTER}"
+	    exec_on_node ${NODE} "ls -la /dev/vd${LETTER} ; echo \$? > /tmp/CODE"
+	    scp -q -o StrictHostKeyChecking=no ${NODE}:/tmp/CODE /tmp/CODE
+            VALUE=`cat /tmp/CODE`
+	    if [ $VALUE -eq 0 ]; then
+		echo "- Switching target on HA node to vd${LETTER}"
+		export REALTARGETVD="vd${LETTER}"
+		break
+	    else
+	        echo "- Trying another letter..."
+	    fi
+	done
+    fi
+}
+
+detach_disk_from_node() {
+    echo $I "############ START detach_disk_from_node" $O
+    if [ $# -ne 2 ]; then echo $F "- detach_disk_from_node needs 2args: NODE / DISK" $O ; exit 1; fi
+    echo $W "- Detach disk ${TARGETVD} from ${NODE}" $O
+    NODE="$1"
+    TARGETVD="$2"
+    echo $W "virsh detach-disk ${NODE} ${TARGETVD}" $O
+    virsh detach-disk ${NODE} ${TARGETVD}
+}
