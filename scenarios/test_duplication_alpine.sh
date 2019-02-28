@@ -221,7 +221,7 @@ clone_vm() {
     for i in `seq 2 $NBNODE`
     do
 	MAC=`(echo ${NODENAME}${i}|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
-	echo "- ${NODENAME}${i} ${STORAGEP}/${IMAGESPATH}/${NODENAME}${i} ${MAC}"
+	echo "- ${NODENAME}${i} ${STORAGEP}/${IMAGESPATH}/${NODENAME}${i}.qcow2 (MAC: ${MAC})"
 	virt-clone --original ${NODENAME}1 --name ${NODENAME}${i} --file ${STORAGEP}/${IMAGESPATH}/${NODENAME}${i}.qcow2 --mac ${MAC}
     done
 }
