@@ -475,7 +475,7 @@ Disk added to test duplication: ${DEVNAME}
 Disk name: ${diskname}
 Dir where disk are stored: ${CLUSTERDUP}
 Test dir on nodes: ${TESTDIR}
-size of the image to duplicate in MB: ${SIZEM}
+Size of the image to duplicate in MB: ${SIZEM}
 
 Number of nodes to deploy (clone of node1): ${NBNODE}
 
