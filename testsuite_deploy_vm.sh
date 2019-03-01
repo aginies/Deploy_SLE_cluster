@@ -77,10 +77,10 @@ install_vm() {
 	   --network network=${NETWORKNAME},mac=${MAC} \
 	   --graphics vnc,keymap=${KEYMAP} \
 	   --disk path=${VMDISK},format=qcow2,bus=virtio,cache=none \
-	   --disk path=${SHAREDISK},bus=virtio \
-	   --disk path=${DISKVM},bus=virtio \
-	   --disk path=${OTHERCDROM},device=cdrom \
-	   --disk path=${SLECDROM},device=cdrom \
+	   --disk path=${SHAREDISK},shareable=on,bus=virtio \
+	   --disk path=${DISKVM},shareable=on,bus=virtio \
+	   --disk path=${OTHERCDROM},shareable=on,device=cdrom \
+	   --disk path=${SLECDROM},shareable=on,device=cdrom \
 	   --location ${SLECDROM} \
 	   --boot cdrom \
 	   --extra-args ${EXTRAARGS} \
@@ -133,7 +133,7 @@ check_before_install
 NAME="${NODENAME}1"
 VMDISK="${STORAGEP}/${LIBVIRTPOOL}/${NAME}.qcow2"
 MAC=`(echo ${NODENAME}${nb}|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
-#install_vm ${MAC}
+install_vm ${MAC}
 
 # install all other VM (minimal autoyast file)
 # Use a minimal installation without X for node2 and node3 etc...
