@@ -8,6 +8,7 @@
 #
 # USE https://wiki.alpinelinux.org/wiki/Installation
 # image: https://www.alpinelinux.org/downloads/ (choose virt one)
+#
 ## SSHD: /etc/ssh/sshd_config
 # PermitRootLogin yes
 # PermitEmptyPasswords yes
@@ -170,7 +171,13 @@ prepare_duplication() {
 run_server_dup() {
   echo $I "############ START run_server_dup" $O
   echo $I "- Start server on node ${NODENAME}1" $O
+  echo "- Manual Launch:"
+  echo "ssh ${NODENAME}1"
+  echo "/root/dolly -s -v -o /root/dolly.log -f /etc/dolly.cfg"
+  echo
+  echo "- Using Screen:"
   echo "ssh ${NODENAME}1 \"screen -d -m /root/dolly -s -v -o /root/dolly.log -f /etc/dolly.cfg\""
+  echo
   echo " PRESS ENTER TWICE TO LAUNCH IT"
   read
   read
@@ -491,7 +498,7 @@ usage of $0 {prepare|cmd|ssh|clone|etchosts|fixhost|virtualnet|pool|device|forma
 	copy ssh root key to all nodes
 
  etchosts
-	add nodes in /etc/hosts
+	add all nodes in /etc/hosts
 
  clone
 	clone ${NODENAME}1 to ${NBNODE}
@@ -510,19 +517,20 @@ usage of $0 {prepare|cmd|ssh|clone|etchosts|fixhost|virtualnet|pool|device|forma
 	fix hostname on all VM
 
  pool
-	create pool and image for nodes 
+	create ${CLUSTERDUP} pool and one image per nodes
 
  device
 	add device ${DEVNAME} to all nodes (/dev/${DEVNAME})
 
  format
-	format ${DEVNAME} and write some files in (on node ${NODENAME}1)
+	format ${DEVNAME} in ext4 and create some files in (on node ${NODENAME}1)
 
  config (/etc/dolly.cfg)
 	prepare the Dolly config file and copy it to all nodes
 
  list
 	list all devices on all nodes (debug devices problem...)
+	all devices should use the same name for duplication
 
  detach
  	detach ${DEVNAME} from all nodes
@@ -531,13 +539,13 @@ usage of $0 {prepare|cmd|ssh|clone|etchosts|fixhost|virtualnet|pool|device|forma
 	delete the pool storage
 
  cmd
- 	execute a command on all node (first arg)
+	execute a command on all node (First arg is mandatory)
 
  runs
 	run dolly server on node ${NODENAME}1
 
  runc
-	run dolly client on all nodes the test
+	run dolly client on all nodes
 
 "
 	;;
