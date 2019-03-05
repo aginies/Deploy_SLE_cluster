@@ -132,7 +132,7 @@ check_before_install
 # Install VM 1
 NAME="${NODENAME}1"
 VMDISK="${STORAGEP}/${LIBVIRTPOOL}/${NAME}.qcow2"
-MAC=`(echo ${NODENAME}${nb}|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
+MAC=`(echo ${NODENAME}1|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
 install_vm ${MAC}
 
 # install all other VM (minimal autoyast file)
