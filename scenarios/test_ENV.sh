@@ -38,6 +38,15 @@ fi
 
 TOCHECK=\$1
 TOCHECKV=\$2
+if [ -z \$3 ]; then 
+	TESTCMD=0
+else
+	TESTCMD=\$3
+fi
+
+# dont check GNU
+if [ "\$1" == "gnu" ]; then exit 1 ; fi
+
 echo " ############# \${TOCHECK} ##################"
 # find module to load before being able to load the expecte module
 module -t spider \${TOCHECK} | grep gnu | awk -F "gnu/7" '{print \$2}' > /tmp/toload
@@ -46,19 +55,19 @@ grep '[^[:blank:]]' < /tmp/toload > /tmp/toload.out
 if [ -s /tmp/toload.out ]; then
 for toload in \`cat /tmp/toload\`
 do
-	if [ \"$toload\" == "gnu" ]; then next; fi
 	echo " With preloaded \${toload}"
 	module load \${toload}
 done
-        module load \${TOCHECK}
-	echo " ---- List of loaded modules:"
-	module -t list 
-	echo " ----"
-        printenv | grep LMOD_FAMILY_\${TOCHECKV^^}
-        printenv | grep LMOD_FAMILY_\${TOCHECKV^^}_VERSION
-        printenv | grep \${TOCHECKV^^}
-        module unload \${TOCHECK}
-        module unload \${toload}
+
+#        module load \${TOCHECK}
+#	echo " ---- List of loaded modules:"
+#	module -t list 
+#	echo " ----"
+#        printenv | grep LMOD_FAMILY_\${TOCHECKV^^}
+#        printenv | grep LMOD_FAMILY_\${TOCHECKV^^}_VERSION
+#        printenv | grep \${TOCHECKV^^}
+#        module unload \${TOCHECK}
+#        module unload \${toload}
 else
         module load \${TOCHECK}
         echo " ---- List of loaded modules:"
@@ -67,6 +76,16 @@ else
         printenv | grep LMOD_FAMILY_\${TOCHECKV^^}
         printenv | grep LMOD_FAMILY_\${TOCHECKV^^}_VERSION
         printenv | grep \${TOCHECKV^^}
+	if [ \$TESTCMD -eq "1" ]; then 
+		mpicc --help > /dev/null
+		if [ \$? != "0" ]; then 
+			echo "- ! mpicc broken!";
+		fi
+		mpirun --help > /dev/null
+		if [ \$? != "0" ]; then 
+			echo "- ! mpirun broken!";
+		fi
+	else
         TOC=\${TOCHECKV^^}
         #cd \`printenv \${TOC}\`
         #echo DEBUG \`printenv \${TOC}\`
@@ -86,7 +105,7 @@ else
                        echo \$F "   !!! Missing \${TOCHECKV^^}_LIB but \${TOCE}/lib64 present" \$O 
                fi
        fi
-
+	fi
         module unload ${TOCHECK}
         module unload ${toload}
 
@@ -112,14 +131,18 @@ do
 		vl=fftw
 	elif [ "\$l" == "mvapich2-psm2" ] || [ "\$l" == "mpich-ofi" ] || [ "\$l" == "mvapich2" ] || [ "\$l" == "mpich" ] || [ "\$l" == "openmpi" ] ;then
 		vl=mpi
+		TESTCMD=1
 	elif [ "\$l" == "netcdf-cxx4" ]; then
 		vl=netcdf
+		TESTCMD=0
 	elif [ "\$l" == "openblas-pthreads" ]; then
 		 vl=openblas
+		TESTCMD=0
 	else
 		vl=\$l
+		TESTCMD=0
 	fi
-	sh ./${RSCRIPTNAME} \$l \$vl
+	sh ./${RSCRIPTNAME} \$l \$vl \$TESTCMD
 done
 EOF
     scp_on_node ${SCRIPTNAME} "test@${NODENAME}1:~/"
