@@ -229,7 +229,7 @@ case "$1" in
     all)
 	ssh_root_key
 	#install_virtualization_stack
-	prepare_remote_pssh
+	#prepare_remote_pssh
 	prepare_etc_hosts
 	prepare_virtual_network
 	prepare_SHARE_pool
@@ -238,7 +238,7 @@ case "$1" in
         ;;
     *)
         echo "
-     Usage: $0 {ssh|vtstack|pssh|etchosts|virtualnet|SHAREpool|autoyastimage|all}
+     Usage: $0 {ssh|vtstack|etchosts|virtualnet|SHAREpool|autoyastimage|all}
      
  vtstack
     install virtualization tools and restart libvirtd
@@ -249,18 +249,16 @@ case "$1" in
  etchosts
     add nodes in /etc/hosts
 
- pssh
-    prepare pssh configuration (with list of nodes)
-
  virtualnet
     create a Virtual Network: DHCP with host/mac/name/ip for nodes
+    (/etc/libvirt/qemu/networks/${NETWORKNAME}.xml)
 
  SHAREpool
-    create an SHARED pool
+    create an SHARED pool (needed to share Images to all nodes)
+    (${STORAGEP}/${SHARENAME})
 
  autoyastimage
-    prepapre an image (raw) which contains autoyast file
-
+    prepare an image (raw) which contains autoyast file
 
 "
 exit 1
