@@ -46,6 +46,7 @@ grep '[^[:blank:]]' < /tmp/toload > /tmp/toload.out
 if [ -s /tmp/toload.out ]; then
 for toload in \`cat /tmp/toload\`
 do
+	if [ \"$toload\" == "gnu" ]; then next; fi
 	echo " With preloaded \${toload}"
 	module load \${toload}
 done
