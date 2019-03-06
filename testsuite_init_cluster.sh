@@ -219,6 +219,7 @@ case "$1" in
 	;;
     all)
     	fix_hostname
+	copy_ssh_key_on_nodes
 	scp_nodes_list
 	munge_key
 	slurm_configuration
