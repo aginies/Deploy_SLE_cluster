@@ -139,7 +139,7 @@ echo $O
 echo
 
 case $1 in
-    mpi)
+    mpib)
 	prepare_mpi
 	;;
     nserver)
@@ -160,12 +160,13 @@ case $1 in
     all)
 	nfs_server
 	nfs_client
-	mpi
-	runmpi
+	user_mpi
+	prepare_mpi
+	run_mpi
 	;;
     *)
 	echo "
-usage of $0 {mpi|nserver|nclient|runmpi|usermpi|back|all}
+usage of $0 {mpib|nserver|nclient|runmpi|usermpi|back|all}
 
  nserver
 	prepare an /export dir for testing
@@ -177,7 +178,7 @@ usage of $0 {mpi|nserver|nclient|runmpi|usermpi|back|all}
 	create an mpitest usr on all nodes (will used /export)
 	deal with ssh key
 
- mpi
+ mpib
 	compile a basic mpi test with mpicc
  
  runmpi
