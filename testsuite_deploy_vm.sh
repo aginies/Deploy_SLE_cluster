@@ -82,12 +82,12 @@ install_vm() {
 	   --disk path=${OTHERCDROM},shareable=on,device=cdrom \
 	   --disk path=${SLECDROM},shareable=on,device=cdrom \
 	   --location ${SLECDROM} \
-	   --boot cdrom \
 	   --extra-args ${EXTRAARGS} \
 	   --watchdog i6300esb,action=poweroff \
 	   --console pty,target_type=virtio \
 	   --check all=off
 }
+	  # --boot cdrom \
 
 check_before_install() {
     echo $I "############ START check_before_install #############" $O
