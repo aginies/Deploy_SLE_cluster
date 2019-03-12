@@ -157,6 +157,20 @@ check_value() {
 }
 
 
+install_package() {
+    echo $I "############ START install_package" $O
+    PKG=$1
+#    for i in `seq 1 $NBNODE`
+#    do
+#        exec_on_node ${NODENAME}${i} "zypper in -y screen"
+#    done
+    for i in `seq 1 $NBNODE`
+    do
+        echo "- Installing $PKG on node ${NODENAME}${i}"
+	ssh ${NODENAME}${i} "screen -d -m zypper in -y $PKG"
+    done
+}
+ 
 check_user() {
     echo $I "############ START check_user" $O
     CS="/tmp/cs"
@@ -217,6 +231,9 @@ case "$1" in
     testuser)
 	create_test_user
 	;;
+    install)
+	install_package $2
+	;;
     all)
     	fix_hostname
 	copy_ssh_key_on_nodes
@@ -253,6 +270,9 @@ case "$1" in
 
  testuser
     create a test user
+
+ install
+    install package name (or list)
 
  all 
     run all in this order
