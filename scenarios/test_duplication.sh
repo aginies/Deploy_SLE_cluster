@@ -5,6 +5,7 @@
 #########################################################
 ## DUPLICATION TEST
 #########################################################
+#
 
 if [ -f ../functions ] ; then
     . ../functions
@@ -20,19 +21,18 @@ else
 fi
 check_load_config_file other
 
-DEVNAME="vdd"
+
+DATA="/dev/vdb"
 diskname="disk"
-CLUSTERDUP="CLUSTERDUP"
-TESTDIR="/mnt/test/"
-# size of the image to duplicate
+CLUSTERDUP="DUP"
+TESTDIR="/mnt/test"
+# size of the image to duplicate (in MB)
 SIZEM="512"
-IMAGENB=${NBNODE}
 
 # BIG CLUSTER CONFIG !
-#IMAGENB=30
-#NODENAME=dolly
-NBNODE=10
-#
+NBNODE=4
+IMAGENB=${NBNODE}
+
 
 prepare_duplication() {
     echo $I "############ START prepare_duplication" $O
@@ -40,21 +40,36 @@ prepare_duplication() {
     for i in `seq 1 $NBNODE`
     do
 	echo "- Node ${NODENAME}${i}:"
-        scp_on_node "../packages/*.rpm" "test@${NODENAME}${i}:/tmp/"
-	exec_on_node ${NODENAME}${i} "zypper in -y screen"
-	exec_on_node ${NODENAME}${i} "zypper in --allow-unsigned-rpm -y  /tmp/dolly*.rpm"
+        scp_on_node "dolly" "root@${NODENAME}${i}:/usr/bin/"
     done
+}
+
+run_server_dup() {
+  echo $I "############ START run_server_dup" $O
+  echo $I "- Start server on node ${NODENAME}1" $O
+  echo "- Manual Launch:"
+  echo "ssh ${NODENAME}1"
+  echo "dolly -s -v -o /root/dolly.log -f /etc/dolly.cfg"
+  echo
+  echo "- Using Screen:"
+  echo "ssh ${NODENAME}1 \"screen -d -m dolly -s -v -o /root/dolly.log -f /etc/dolly.cfg\""
+  echo
+  echo " PRESS ENTER TWICE TO LAUNCH IT"
+  read
+  read
+  ssh ${NODENAME}1 "screen -d -m dolly -s -v -f /etc/dolly.cfg"
 }
 
 run_duplication() {
    echo $I "############ START run_duplication" $O
-   echo $I "- Start server on node ${NODENAME}1" $O
-   #exec_on_node ${NODENAME}1 "screen -S dollyServer \"dolly -v -s -f /etc/dolly.cfg\""
    echo $I "- Start client on all other nodes" $O
    for i in `seq 2 $NBNODE`
    do
-	echo "ssh ${NODENAME}${i} \"dolly -v -f /etc/dolly.cfg\""
-	#exec_on_node ${NODENAME}${i} "screen -S dollyClient \"dolly -v -f /etc/dolly.cfg\""
+	echo "- Killall -9 dolly on nodes ${NODENAME}${i} in case off..."
+	ssh ${NODENAME}${i} "killall -9 dolly"
+	echo "ssh ${NODENAME}${i} \"screen -d -m dolly -v -f /etc/dolly.cfg\""
+	ssh ${NODENAME}${i} "screen -d -m dolly -v -f /etc/dolly.cfg"
+	sleep 1
    done
 }
 
@@ -62,8 +77,8 @@ config_set() {
    echo $I "############ START config_set" $O
    CLIENTS=`echo $((${NBNODE}-1))`
    cat > dolly.cfg <<EOF
-infile /dev/${DEVNAME}
-outfile /dev/${DEVNAME}
+infile ${DATA}
+outfile ${DATA}
 server ${NODENAME}1
 firstclient ${NODENAME}2
 lastclient ${NODENAME}${NBNODE}
@@ -85,6 +100,27 @@ echo "endconfig" >> dolly.cfg
 	echo "################"
 	rm dolly.cfg
 }
+
+start_vm() {
+    echo $I "############ START start_vm" $O
+    for i in `seq 1 $NBNODE`
+    do
+	echo "- Starting domain ${NODENAME}${i}"
+	virsh start ${NODENAME}${i}
+	sleep 2
+    done
+}
+
+stop_vm() {
+    echo $I "############ START stop_vm" $O
+    for i in `seq 1 $NBNODE`
+    do
+	echo "- Stoping domain ${NODENAME}${i}"
+	virsh destroy ${NODENAME}${i}
+	sleep 1
+    done
+}
+
 
 create_pool_storage() {
     echo $I "############ START create_pool_storage" $O
@@ -113,56 +149,60 @@ create_pool_storage() {
     done
 }
 
-delete_pool_storage() {
-    echo $I "############ START delete_pool_storage"
-    echo $W "- Destroy current pool ${CLUSTERDUP}" $O
-    virsh pool-destroy ${CLUSTERDUP}
-    echo $W "- Undefine current pool ${CLUSTERDUP}" $O
-    virsh pool-undefine ${CLUSTERDUP}
-    rm -rfv ${STORAGEP}/${CLUSTERDUP}
-}
-
-
 add_device() {
    echo $I "############ START add_device" $O
    vol="1"
    for i in `seq 1 $NBNODE`
-	do
-	echo $I "- Attaching disk ${diskname}${vol} from pool ${CLUSTERDUP} to ${NODENAME}${i} (expecting: /dev/${DEVNAME})" $O
-	attach_disk_to_node ${NODENAME}${i} ${CLUSTERDUP} ${diskname}${vol} ${DEVNAME} img
-	((vol++))
+   do
+       echo $I "- Attaching disk ${diskname}${vol} from pool ${CLUSTERDUP} to ${NODENAME}${i} (expecting: /dev/${DEVNAME})" $O
+       attach_disk_to_node ${NODENAME}${i} ${CLUSTERDUP} ${diskname}${vol} ${DEVNAME} img
+       ((vol++))
    done
 }
 
 detach_dev_from_node() {
-   echo $I "############ START detach_disk_from_node" $O
-   for i in `seq 1 $NBNODE`
-   do
+    echo $I "############ START detach_disk_from_node" $O
+    for i in `seq 1 $NBNODE`
+    do
 	detach_disk_from_node ${NODENAME}${i} ${DEVNAME}
-   done
+    done
 }
 
+cmd_on_nodes() {
+    echo $I "############ START cmd" $O
+    if [ -z "$1" ]; then echo "- First arg must be the command!"; exit 1; fi
+    CMD="$1"
+    for i in `seq 1 $NBNODE`
+    do
+        exec_on_node ${NODENAME}${i} "$CMD"
+    done
+}
 
 list_devices() {
-   echo $I "############ START list_devices" $O
-   for i in `seq 1 $NBNODE`
-   do
+    echo $I "############ START list_devices" $O
+    for i in `seq 1 $NBNODE`
+    do
 	echo "- Devices on node ${NODENAME} ${i}"
 	exec_on_node ${NODENAME}${i} "fdisk -l | grep \"^Disk /dev\""
-   done
+    done
 }
 
 format_device() {
-   echo $I "############ START format_device" $O
-   echo $I "- Format /dev/${DEVNAME} in ext4 and store some date" $0
-   exec_on_node ${NODENAME}1 "mkfs.ext4 -v /dev/${DEVNAME}"
-   exec_on_node ${NODENAME}1 "mkdir -p ${TESTDIR}" IGNORE=1
-   exec_on_node ${NODENAME}1 "mount /dev/${DEVNAME} ${TESTDIR}"
-   exec_on_node ${NODENAME}1 "cp -av /tmp/*.rpm ${TESTDIR}"
-   echo $I "- Do some checksum to test after" $0
-   exec_on_node ${NODENAME}1 "cd ${TESTDIR} && sha256sum *.rpm > TOCHEK"
-   echo $I "- Umount ${TESTDIR}" $0
-   exec_on_node ${NODENAME}1 "umount ${TESTDIR}"
+    echo $I "############ START format_device" $O
+    echo $I "- Format ${DATA} in ext4 and store some date" $O
+    exec_on_node ${NODENAME}1 "mkfs.ext4 -v ${DATA}"
+    exec_on_node ${NODENAME}1 "mkdir -p ${TESTDIR}" IGNORE=1
+    exec_on_node ${NODENAME}1 "mount ${DATA} ${TESTDIR}"
+    exec_on_node ${NODENAME}1 "dd if=/dev/zero of=${TESTDIR}/data50M bs=1M count=50"
+    exec_on_node ${NODENAME}1 "dd if=/dev/zero of=${TESTDIR}/data150M bs=1M count=150"
+    exec_on_node ${NODENAME}1 "dd if=/dev/zero of=${TESTDIR}/data200M bs=1M count=200"
+    exec_on_node ${NODENAME}1 "dd if=/dev/zero of=${TESTDIR}/data68M bs=1M count=68"
+    exec_on_node ${NODENAME}1 "sync"
+    echo $I "- Do some checksum to test after" $O
+    exec_on_node ${NODENAME}1 "cd ${TESTDIR} && sha256sum data* > TOCHECK"
+    exec_on_node ${NODENAME}1 "cd ${TESTDIR} && cat TOCHECK"
+    echo $I "- Umount ${TESTDIR}" $O
+    exec_on_node ${NODENAME}1 "umount ${TESTDIR}"
 }
 
 ##########################
@@ -183,7 +223,16 @@ case $1 in
     prepare)
 	prepare_duplication
 	;;
-    run)
+    start)
+	start_vm
+	;;
+    stop)
+	stop_vm
+	;;
+    runs)
+	run_server_dup
+	;;
+    runc)
 	run_duplication
 	;;
     pool)
@@ -201,6 +250,9 @@ case $1 in
     list)
 	list_devices
 	;;
+    cmd)
+	cmd_on_nodes $2
+	;;
     detach)
 	detach_dev_from_node
 	;;
@@ -212,34 +264,75 @@ case $1 in
 	;;
     *)
 	echo "
-usage of $0 {prepare|pool|device|format|config|deletepool|run|list|all}
 
- prepare
-	install all needed on all nodes
+##########################################
+Adjust the VAR if needed:
+--------------------------
+Cluster name: ${CLUSTER}
+Image of VM are stored in : ${STORAGEP}
+IDrsa pub key is: ${IDRSA}
+
+UUID: ${UUID}
+NODEDOMAIN: ${NODEDOMAIN}
+NETWORMNAME (libvirt): ${NETWORKNAME}
+IP of the ${NETWORK}
+MAC HOST: ${NETMACHOST}
+Brdige used: ${BRIDGE}
+
+Nodename: ${NODENAME}
+Disk added to test duplication: ${DATA}
+Disk name: ${diskname}
+Dir where disk are stored: ${CLUSTERDUP}
+Test dir on nodes: ${TESTDIR}
+Size of the image to duplicate in MB: ${SIZEM}
+
+Number of nodes to deploy (clone of node1): ${NBNODE}
+
+################################################
+INFO : Default root pass on Alpine VM is empty
+################################################
+
+usage of $0 
+
+ prepare (no mandatory)
+	copy dolly on all nodes (no needed with alpine VM)
+
+ start
+	start all VM
+
+ stop
+	stop all VM
 
  pool
-	create pool and image for nodes 
+	create ${CLUSTERDUP} pool and one image per nodes
 
  device
-	add device ${DEVNAME} to all nodes
+	add device ${DATA} to all nodes
 
  format
-	format ${DEVNAME} and write some files in
+	format ${DATA} in ext4 and create some files in (on node ${NODENAME}1)
 
- config
-	prepare the config file
+ config (/etc/dolly.cfg)
+	prepare the Dolly config file and copy it to all nodes
 
  list
-	list all devices on all nodes
+	list all devices on all nodes (debug devices problem...)
+	all devices should use the same name for duplication
 
  detach
- 	detach ${DEVNAME} from all nodes
+ 	detach ${DATA} from all nodes
 
  deletepool
 	delete the pool storage
 
- run
-	run the test 
+ cmd
+	execute a command on all node (First arg is mandatory)
+
+ runs
+	run dolly server on node ${NODENAME}1
+
+ runc
+	run dolly client on all nodes
 
 "
 	;;
