@@ -154,7 +154,6 @@ do
 		echo " 		PRESS ENTER TO CONTINUE"
 		read
 	fi
-	install_vm ${MAC}
 	echo
 	echo "########################################################################"
 	echo
@@ -164,6 +163,7 @@ do
 	echo "########################################################################"
 	read
 	read
+	install_vm ${MAC}
 done
 
 # Check VM
