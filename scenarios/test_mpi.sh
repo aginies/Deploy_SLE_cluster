@@ -100,6 +100,9 @@ EOF"
 nfs_client() {
     echo $I "############ START nfs_client" $O
     # only starting from NODE2 as node1 export the NFS dir
+    install_package nfs-utils 
+    echo "- Sleep 10sec to be sure all packages needed will be installed"
+    sleep 10
     for i in `seq 2 $NBNODE`
     do 
 #	exec_on_node ${NODENAME}${i} "zypper in -y nfs-utils"
