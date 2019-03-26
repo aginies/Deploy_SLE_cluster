@@ -217,6 +217,12 @@ case "$1" in
     testuser)
 	create_test_user
 	;;
+    start)
+	start_vm
+	;;
+    stop)
+	stop_vm
+	;;
     install)
 	install_package $2
 	;;
@@ -247,6 +253,12 @@ case "$1" in
 
  ganglia
     configure apache and get ganglia up
+
+ start
+    start all nodes
+
+ stop 
+    stop all nodes
 
  nodeslist
     copy the full nodes list to all nodes in /etc/nodes file

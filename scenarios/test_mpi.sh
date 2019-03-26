@@ -114,6 +114,15 @@ nfs_client() {
     done
 }
 
+mount_export() {
+    echo $I "############ START nfs_client" mount_export" $O
+    for i in `seq 2 $NBNODE`
+    do
+    exec_on_node ${NODENAME}${i} "mount ${NODENAME}1:/export /export"
+    done
+}
+
+
 back_to_start() {
     echo $I "############ START back_to_start" $O
     exec_on_node  ${NODENAME}1 "cp -vf /etc/exports.bck /etc/exports"
@@ -151,6 +160,9 @@ case $1 in
     nclient)
 	nfs_client
 	;;
+    mount)
+	mount_export
+	;;
     usermpi)
 	user_mpi
 	;;
@@ -169,7 +181,7 @@ case $1 in
 	;;
     *)
 	echo "
-usage of $0 {mpib|nserver|nclient|runmpi|usermpi|back|all}
+usage of $0
 
  nserver
 	prepare an /export dir for testing
@@ -180,6 +192,9 @@ usage of $0 {mpib|nserver|nclient|runmpi|usermpi|back|all}
  usermpi
 	create an mpitest usr on all nodes (will used /export)
 	deal with ssh key
+
+ mount
+	mount /export on all nodes
 
  mpib
 	compile a basic mpi test with mpicc

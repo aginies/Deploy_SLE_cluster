@@ -46,8 +46,8 @@ UUID="951e50f1-db73-475a-895f-34562baf8e8f"
 NODEDOMAIN="duplication.com"
 NETWORKNAME="duplication"
 NETWORK="192.168.222"
-NETMACHOST="e4:b9:7a:7b:bf:df"
-BRIDGE="vibr0"
+NETMACHOST="52:54:00:89:b0:c9"
+BRIDGE="vibr2"
 
 NODENAME="alpine"
 DEVNAME="vdb"
@@ -55,10 +55,10 @@ diskname="disk"
 CLUSTERDUP="DUP"
 TESTDIR="/mnt/test"
 # size of the image to duplicate (in MB)
-SIZEM="512"
+SIZEM="1024"
 
 # BIG CLUSTER CONFIG !
-NBNODE=35
+NBNODE=12
 IMAGENB=${NBNODE}
 
 
@@ -249,26 +249,6 @@ delete_vm() {
 	virsh undefine ${NODENAME}${i}
 	echo "- Deleting storage for ${NODENAME}${i}"
 	rm -v ${STORAGEP}/${IMAGESPATH}/${NODENAME}${i}.qcow2
-    done
-}
-
-start_vm() {
-    echo $I "############ START start_vm" $O
-    for i in `seq 1 $NBNODE`
-    do
-	echo "- Starting domain ${NODENAME}${i}"
-	virsh start ${NODENAME}${i}
-	sleep 2
-    done
-}
-
-stop_vm() {
-    echo $I "############ START stop_vm" $O
-    for i in `seq 1 $NBNODE`
-    do
-	echo "- Stoping domain ${NODENAME}${i}"
-	virsh destroy ${NODENAME}${i}
-	sleep 1
     done
 }
 
