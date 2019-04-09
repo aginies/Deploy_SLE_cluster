@@ -264,7 +264,7 @@
       <package>openssh</package>
       <package>zypper</package>
       <package>vim</package>
-      <!--      <package>ntp</package> -->
+      <package>screen</package>
       <package>strace</package>
       <package>less</package>
       <package>man</package>
