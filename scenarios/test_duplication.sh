@@ -65,15 +65,15 @@ run_server_dup_plus() {
   echo $I "- Start server on node ${NODENAME}1" $O
   echo "- Manual Launch:"
   echo "ssh ${NODENAME}1"
-  echo "dollyS -vs /etc/dollyplus.cfg"
+  echo "dollyS -v -f /etc/dollyplus.cfg"
   echo
   echo "- Using Screen:"
-  echo "ssh ${NODENAME}1 \"screen -d -m dollyS -vs /etc/dollyplus.cfg\""
+  echo "ssh ${NODENAME}1 \"screen -d -m dollyS -v -f /etc/dollyplus.cfg\""
   echo
   echo " PRESS ENTER TWICE TO LAUNCH IT"
   read
   read
-  ssh ${NODENAME}1 "screen -d -m dollyS -vs /etc/dollyiplus.cfg"
+  ssh ${NODENAME}1 "screen -d -m dollyS -v -f /etc/dollyiplus.cfg"
 }
 
 
@@ -84,8 +84,8 @@ run_duplication() {
    do
 	echo "- Killall -9 dolly on nodes ${NODENAME}${i} in case off..."
 	ssh ${NODENAME}${i} "killall -9 dolly"
-	echo "ssh ${NODENAME}${i} \"screen -d -m dolly -v -f /etc/dolly.cfg\""
-	ssh ${NODENAME}${i} "screen -d -m dolly -v -f /etc/dolly.cfg"
+	echo "ssh ${NODENAME}${i} \"screen -d -m dolly -v\""
+	ssh ${NODENAME}${i} "screen -d -m dolly -v"
 	sleep 1
    done
 }
@@ -120,15 +120,12 @@ echo "${NODENAME}${i}" >> dollyplus.cfg
 done
 echo "endconfig" >> dollyplus.cfg
 
-	for i in `seq 1 $NBNODE`
-	do
-		scp_on_node dollyplus.cfg "root@${NODENAME}${i}:/etc/"
-	done
-	echo "- CONFIGURATION:"
-	echo "################"
-	cat dollyplus.cfg
-	echo "################"
-	rm dollyplus.cfg
+scp_on_node dollyplus.cfg "root@${NODENAME}1:/etc/"
+echo "- CONFIGURATION:"
+echo "################"
+cat dollyplus.cfg
+echo "################"
+rm dollyplus.cfg
 }
 
 
@@ -148,16 +145,12 @@ do
 echo "${NODENAME}${i}" >> dolly.cfg
 done
 echo "endconfig" >> dolly.cfg
-
-	for i in `seq 1 $NBNODE`
-	do
-		scp_on_node dolly.cfg "root@${NODENAME}${i}:/etc/"
-	done
-	echo "- CONFIGURATION:"
-	echo "################"
-	cat dolly.cfg
-	echo "################"
-	rm dolly.cfg
+scp_on_node dolly.cfg "root@${NODENAME}1:/etc/"
+echo "- CONFIGURATION:"
+echo "################"
+cat dolly.cfg
+echo "################"
+rm dolly.cfg
 }
 
 start_vm() {

@@ -191,8 +191,8 @@ run_duplication() {
    do
 	echo "- Killall -9 dolly on nodes ${NODENAME}${i} in case off..."
 	ssh ${NODENAME}${i} "killall -9 dolly"
-	echo "ssh ${NODENAME}${i} \"screen -d -m /root/dolly -v -f /etc/dolly.cfg\""
-	ssh ${NODENAME}${i} "screen -d -m /root/dolly -v -f /etc/dolly.cfg"
+	echo "ssh ${NODENAME}${i} \"screen -d -m /root/dolly\""
+	ssh ${NODENAME}${i} "screen -d -m /root/dolly -v"
 	sleep 1
    done
 }
@@ -214,15 +214,12 @@ echo "${NODENAME}${i}" >> dolly.cfg
 done
 echo "endconfig" >> dolly.cfg
 
-	for i in `seq 1 $NBNODE`
-	do
-		scp_on_node dolly.cfg "root@${NODENAME}${i}:/etc/"
-	done
-	echo "- CONFIGURATION:"
-	echo "################"
-	cat dolly.cfg
-	echo "################"
-	rm dolly.cfg
+scp_on_node dolly.cfg "root@${NODENAME}${i}:/etc/"
+echo "- CONFIGURATION:"
+echo "################"
+cat dolly.cfg
+echo "################"
+rm dolly.cfg
 }
 
 clone_vm() {
