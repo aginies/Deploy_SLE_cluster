@@ -123,3 +123,23 @@ create_pool() {
     virsh pool-autostart ${POOL}
 }
 
+start_vm() {
+    echo $I "############ START start_vm" $O
+    for i in `seq 1 $NBNODE`
+    do
+        echo "- Starting domain ${NODENAME}${i}"
+        virsh start ${NODENAME}${i}
+        sleep 2
+    done
+}
+
+stop_vm() {
+    echo $I "############ START stop_vm" $O
+    for i in `seq 1 $NBNODE`
+    do
+        echo "- Stoping domain ${NODENAME}${i}"
+        virsh destroy ${NODENAME}${i}
+        sleep 1
+    done
+}
+

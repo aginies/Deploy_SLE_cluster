@@ -84,7 +84,7 @@ user_mpi() {
     echo $I "############ START user_mpi" $O
     for i in `seq 1 $NBNODE`
     do
-	exec_on_node ${NODENAME}${i} "useradd -d /export -g users -G slurm -M -p "a" -u 666 mpitest" IGNORE=1
+	exec_on_node ${NODENAME}${i} "useradd -d /export -g users -G slurm -M -p \"a\" -u 666 mpitest" IGNORE=1
     done
     exec_on_node ${NODENAME}1 "mkdir -p /export/.ssh"
     scp_on_node ~/.ssh/${IDRSA}.pub "${NODENAME}1:/export/.ssh/authorized_keys"
@@ -113,6 +113,15 @@ nfs_client() {
 	exec_on_node ${NODENAME}${i} "mount ${NODENAME}1:/export /export"
     done
 }
+
+mount_export() {
+    echo $I "############ START nfs_client mount_export" $O
+    for i in `seq 2 $NBNODE`
+    do
+    exec_on_node ${NODENAME}${i} "mount ${NODENAME}1:/export /export"
+    done
+}
+
 
 back_to_start() {
     echo $I "############ START back_to_start" $O
@@ -151,6 +160,9 @@ case $1 in
     nclient)
 	nfs_client
 	;;
+    mount)
+	mount_export
+	;;
     usermpi)
 	user_mpi
 	;;
@@ -169,7 +181,7 @@ case $1 in
 	;;
     *)
 	echo "
-usage of $0 {mpib|nserver|nclient|runmpi|usermpi|back|all}
+usage of $0
 
  nserver
 	prepare an /export dir for testing
@@ -180,6 +192,9 @@ usage of $0 {mpib|nserver|nclient|runmpi|usermpi|back|all}
  usermpi
 	create an mpitest usr on all nodes (will used /export)
 	deal with ssh key
+
+ mount
+	mount /export on all nodes
 
  mpib
 	compile a basic mpi test with mpicc
