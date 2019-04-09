@@ -43,6 +43,14 @@ copy_ssh_key_on_nodes() {
     done
 }
 
+enable_DVD_media() {
+echo $I "############ START enable_DVD_media"$O
+    for i in `seq 1 $NBNODE`
+    do
+	exec_on_node ${NODENAME}${i} "zypper mr -e 1 2 3 4 5 6 7"
+    done
+}
+
 ganglia_web() {
     echo $I "############ START ganglia_web"
     echo "- Enable php7 and restart apache2" $O
@@ -211,6 +219,9 @@ case "$1" in
     ganglia)
 	ganglia_web
 	;;
+    media)
+	enable_DVD_media
+	;;
     nodeslist)
     	scp_nodes_list
     	;;
@@ -231,10 +242,13 @@ case "$1" in
 	;;
     *)
         echo "
-     Usage: $0 {hostname|nodeslist|ganglia|sshkeynode|slurm|munge|testuser|all}
+Usage: $0
 
  hostname
     fix /etc/hostname on all nodes
+
+ media
+    enable DVD media on all nodes
 
  munge
     copy munger.key from ${NODENAME}1 to all other nodes
