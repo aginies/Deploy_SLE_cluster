@@ -22,7 +22,7 @@ fi
 check_load_config_file other
 
 
-DATA="/dev/vdb"
+DATA="vdd"
 diskname="disk"
 CLUSTERDUP="DUP"
 TESTDIR="/mnt/test"
@@ -30,7 +30,7 @@ TESTDIR="/mnt/test"
 SIZEM="512"
 
 # BIG CLUSTER CONFIG !
-NBNODE=4
+NBNODE=6
 IMAGENB=${NBNODE}
 
 
@@ -60,6 +60,23 @@ run_server_dup() {
   ssh ${NODENAME}1 "screen -d -m dolly -s -v -f /etc/dolly.cfg"
 }
 
+run_server_dup_plus() {
+  echo $I "############ START run_server_dup_plus" $O
+  echo $I "- Start server on node ${NODENAME}1" $O
+  echo "- Manual Launch:"
+  echo "ssh ${NODENAME}1"
+  echo "dollyS -vs /etc/dollyplus.cfg"
+  echo
+  echo "- Using Screen:"
+  echo "ssh ${NODENAME}1 \"screen -d -m dollyS -vs /etc/dollyplus.cfg\""
+  echo
+  echo " PRESS ENTER TWICE TO LAUNCH IT"
+  read
+  read
+  ssh ${NODENAME}1 "screen -d -m dollyS -vs /etc/dollyiplus.cfg"
+}
+
+
 run_duplication() {
    echo $I "############ START run_duplication" $O
    echo $I "- Start client on all other nodes" $O
@@ -73,12 +90,54 @@ run_duplication() {
    done
 }
 
+run_duplication_plus() {
+   echo $I "############ START run_duplication_plus" $O
+   echo $I "- Start client on all other nodes" $O
+   for i in `seq 2 $NBNODE`
+   do
+	echo "- Killall -9 dollyC on nodes ${NODENAME}${i} in case off..."
+	ssh ${NODENAME}${i} "killall -9 dollyC"
+	echo "ssh ${NODENAME}${i} \"screen -d -m dollyC -v\""
+	ssh ${NODENAME}${i} "screen -d -m dollyC"
+	sleep 1
+   done
+}
+
+config_set_plus() {
+   echo $I "############ START config_set_plus" $O
+   CLIENTS=`echo $((${NBNODE}-1))`
+   cat > dollyplus.cfg <<EOF
+iofiles 1
+/dev/${DATA} > /dev/$DATA
+server ${NODENAME}1
+firstclient ${NODENAME}2
+lastclient ${NODENAME}${NBNODE}
+clients ${CLIENTS}
+EOF
+for i in `seq 2 $NBNODE`
+do
+echo "${NODENAME}${i}" >> dollyplus.cfg
+done
+echo "endconfig" >> dollyplus.cfg
+
+	for i in `seq 1 $NBNODE`
+	do
+		scp_on_node dollyplus.cfg "root@${NODENAME}${i}:/etc/"
+	done
+	echo "- CONFIGURATION:"
+	echo "################"
+	cat dollyplus.cfg
+	echo "################"
+	rm dollyplus.cfg
+}
+
+
 config_set() {
    echo $I "############ START config_set" $O
    CLIENTS=`echo $((${NBNODE}-1))`
    cat > dolly.cfg <<EOF
-infile ${DATA}
-outfile ${DATA}
+infile /dev/${DATA}
+outfile /dev/${DATA}
 server ${NODENAME}1
 firstclient ${NODENAME}2
 lastclient ${NODENAME}${NBNODE}
@@ -121,7 +180,6 @@ stop_vm() {
     done
 }
 
-
 create_pool_storage() {
     echo $I "############ START create_pool_storage" $O
     virsh pool-list --all | grep ${CLUSTERDUP} > /dev/null
@@ -154,8 +212,8 @@ add_device() {
    vol="1"
    for i in `seq 1 $NBNODE`
    do
-       echo $I "- Attaching disk ${diskname}${vol} from pool ${CLUSTERDUP} to ${NODENAME}${i} (expecting: /dev/${DEVNAME})" $O
-       attach_disk_to_node ${NODENAME}${i} ${CLUSTERDUP} ${diskname}${vol} ${DEVNAME} img
+       echo $I "- Attaching disk ${diskname}${vol} from pool ${CLUSTERDUP} to ${NODENAME}${i} (expecting: ${DATA})" $O
+       attach_disk_to_node ${NODENAME}${i} ${CLUSTERDUP} ${diskname}${vol} ${DATA} img
        ((vol++))
    done
 }
@@ -164,7 +222,7 @@ detach_dev_from_node() {
     echo $I "############ START detach_disk_from_node" $O
     for i in `seq 1 $NBNODE`
     do
-	detach_disk_from_node ${NODENAME}${i} ${DEVNAME}
+	detach_disk_from_node ${NODENAME}${i} ${DATA}
     done
 }
 
@@ -189,10 +247,10 @@ list_devices() {
 
 format_device() {
     echo $I "############ START format_device" $O
-    echo $I "- Format ${DATA} in ext4 and store some date" $O
-    exec_on_node ${NODENAME}1 "mkfs.ext4 -v ${DATA}"
+    echo $I "- Format /dev/${DATA} in ext4 and store some date" $O
+    exec_on_node ${NODENAME}1 "mkfs.ext4 -v /dev/${DATA}"
     exec_on_node ${NODENAME}1 "mkdir -p ${TESTDIR}" IGNORE=1
-    exec_on_node ${NODENAME}1 "mount ${DATA} ${TESTDIR}"
+    exec_on_node ${NODENAME}1 "mount /dev/${DATA} ${TESTDIR}"
     exec_on_node ${NODENAME}1 "dd if=/dev/zero of=${TESTDIR}/data50M bs=1M count=50"
     exec_on_node ${NODENAME}1 "dd if=/dev/zero of=${TESTDIR}/data150M bs=1M count=150"
     exec_on_node ${NODENAME}1 "dd if=/dev/zero of=${TESTDIR}/data200M bs=1M count=200"
@@ -229,12 +287,24 @@ case $1 in
     stop)
 	stop_vm
 	;;
+    config)
+	config_set
+	;;
     runs)
 	run_server_dup
 	;;
     runc)
 	run_duplication
 	;;
+    configp)
+        config_set_plus
+        ;;
+    runsp)
+        run_server_dup_plus
+        ;;
+    runcp)
+        run_duplication_plus
+        ;;
     pool)
 	create_pool_storage
 	;;
@@ -243,9 +313,6 @@ case $1 in
 	;;
     format)
 	format_device
-	;;
-    config)
-	config_set
 	;;
     list)
 	list_devices
@@ -315,6 +382,9 @@ usage of $0
  config (/etc/dolly.cfg)
 	prepare the Dolly config file and copy it to all nodes
 
+ configp (/etc/dollyplus.cfg)
+	prepare the Dolly++ config file and copy it to all nodes
+
  list
 	list all devices on all nodes (debug devices problem...)
 	all devices should use the same name for duplication
@@ -333,6 +403,12 @@ usage of $0
 
  runc
 	run dolly client on all nodes
+
+ runsp
+	run dollyS server on node ${NODENAME}1
+
+ runcp
+	run dollyC client on all nodes
 
 "
 	;;

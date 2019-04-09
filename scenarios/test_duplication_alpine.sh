@@ -305,7 +305,7 @@ add_device() {
    for i in `seq 1 $NBNODE`
    do
        echo $I "- Attaching disk ${diskname}${vol} from pool ${CLUSTERDUP} to ${NODENAME}${i} (expecting: /dev/${DEVNAME})" $O
-       attach_disk_to_node ${NODENAME}${i} ${CLUSTERDUP} ${diskname}${vol} ${DEVNAME} img
+       attach_disk_to_node ${NODENAME}${i} ${CLUSTERDUP} ${diskname}${vol} ${DATA} img
        ((vol++))
    done
 }
