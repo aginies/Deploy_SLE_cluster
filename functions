@@ -109,6 +109,7 @@ create_pool() {
     if [ $# -lt 1 ];then echo "! 1 arg needed: POOL_NAME; Exiting" ; exit 1; fi
     POOL=$1
     echo "############ START create a pool ${POOL} #############"
+    mkdir -p ${STORAGEP}/${POOL}
     virsh pool-list --all | grep ${POOL} > /dev/null
     if [ $? == "0" ]; then
         echo "- ${POOL} already present, deleting it"
