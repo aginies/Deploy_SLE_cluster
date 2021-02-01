@@ -81,6 +81,7 @@ slurm_configuration() {
     perl -pi -e "s/ControlMachine.*/ControlMachine=${NODENAME}1/" slurm.conf
     perl -pi -e "s/#BackupController.*/BackupController=${NODENAME}2/" slurm.conf
     perl -pi -e "s/MpiDefault.*/MpiDefault=openmpi/" slurm.conf
+    perl -pi -e "s/SlurmctldHost.*/SlurmctldHost=${NODENAME}1/" slurm.conf
 
     echo "- Copy slurm.conf on all nodes" 
     for i in `seq 1 $NBNODE`
