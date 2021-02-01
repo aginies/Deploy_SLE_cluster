@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE profile>
 <profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
-  <add-on>
-    <add_on_products config:type="list">
+<add-on>
+  <add_on_products config:type="list">
       <listentry>
         <media_url><![CDATA[dvd:///?devices=/dev/sr0]]></media_url>
         <product>sle-module-development-tools</product>
@@ -34,7 +34,7 @@
         <product_dir>/Module-Web-Scripting</product_dir>
       </listentry>
     </add_on_products>
-  </add-on>
+</add-on>
   <bootloader>
     <global>
       <activate>true</activate>
@@ -166,8 +166,9 @@
   <services-manager>
     <default_target>graphical</default_target>
     <services>
-      <disable config:type="list"/>
+      <disable config:type="list">
       <service>postfix</service>
+      </disable>
       <enable config:type="list">
 	<service>getty@tty1</service>
 	<service>getty@tty7</service>
