@@ -17,7 +17,7 @@ check_load_config_file other
 build_env() {
     echo $I "############ START build_env" $O
     echo $I "-Install all packages on node ${NODENAME}1" $O
-    exec_on_node ${NODENAME}1 "zypper addrepo http://download.suse.de/ibs/SUSE:/SLE-15-SP1:/GA/standard/ ext"
+    exec_on_node ${NODENAME}1 "zypper addrepo http://download.suse.de/ibs/SUSE:/SLE-15-SP3:/GA/standard/ ext"
     exec_on_node ${NODENAME}1 "zypper ref ext"
     exec_on_node ${NODENAME}1 "zypper in -y rpmbuild osc"
     exec_on_node ${NODENAME}1 "zypper removerepo ext"
