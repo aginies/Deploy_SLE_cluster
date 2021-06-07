@@ -63,6 +63,8 @@ prepare_remote_pssh() {
 	do
     	echo ${NODENAME}${i} >> ${PSSHCONF}
     done
+    echo "- usage:" $O
+    echo "pssh -h ${PSSHCONF} [command]" $O
 }
 
 # ADD node to /etc/hosts (hosts)
@@ -238,13 +240,16 @@ case "$1" in
         ;;
     *)
         echo "
-     Usage: $0 {ssh|vtstack|etchosts|virtualnet|SHAREpool|autoyastimage|all}
+     Usage: $0 {ssh|pssh|vtstack|etchosts|virtualnet|SHAREpool|autoyastimage|all}
      
  vtstack
     install virtualization tools and restart libvirtd
 
  ssh
     generate an ssh root key, and prepare a config to connect to nodes
+
+ pssh
+    Install pssh and create ${PSSHCONF}
 
  etchosts
     add nodes in /etc/hosts
