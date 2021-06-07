@@ -27,10 +27,10 @@ diskname="disk"
 CLUSTERDUP="DUP"
 TESTDIR="/mnt/test"
 # size of the image to duplicate (in MB)
-SIZEM="512"
+SIZEM="15120"
 
 # BIG CLUSTER CONFIG !
-NBNODE=6
+NBNODE=3
 IMAGENB=${NBNODE}
 
 
@@ -73,7 +73,7 @@ run_server_dup_plus() {
   echo " PRESS ENTER TWICE TO LAUNCH IT"
   read
   read
-  ssh ${NODENAME}1 "screen -d -m dollyS -v -f /etc/dollyiplus.cfg"
+  ssh ${NODENAME}1 "screen -d -m dollyS -v -f /etc/dollyplus.cfg"
 }
 
 
@@ -219,13 +219,22 @@ detach_dev_from_node() {
     done
 }
 
+delete_pool_storage() {
+    echo $I "############ START delete_pool_storage"
+    echo $W "- Destroy current pool ${CLUSTERDUP}" $O
+    virsh pool-destroy ${CLUSTERDUP}
+    echo $W "- Undefine current pool ${CLUSTERDUP}" $O
+    virsh pool-undefine ${CLUSTERDUP}
+    rm -rfv ${STORAGEP}/${CLUSTERDUP}
+}
+
 cmd_on_nodes() {
     echo $I "############ START cmd" $O
     if [ -z "$1" ]; then echo "- First arg must be the command!"; exit 1; fi
     CMD="$1"
     for i in `seq 1 $NBNODE`
     do
-        exec_on_node ${NODENAME}${i} "$CMD"
+        eec_on_node ${NODENAME}${i} "$CMD"
     done
 }
 
