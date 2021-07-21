@@ -10,7 +10,7 @@ This scripts will configure:
 
 All configurations files on the host are dedicated for this cluster, which means
 this should not interact or destroy any other configuration (pool, net, etc...)
-This is possible to get multiple instance of cluster from different product/SP, its just 
+This is possible to get multiple instance of cluster from different product/SP, its just
 a matter of taking care of path, variable and VM names in the configuration to avoid overlap.
 
 Please report any bugs or improvments to:
@@ -21,6 +21,7 @@ https://github.com/aginies/Deploy_SLE_cluster.git
 * *WARNING* All guest installation will be done at the same time (5 nodes), time between install is 5 seconds
 * *NOTE* You need an other DVD (HA or HPC) and an SLE1XSPX ISO DVD as source for Zypper (optionnal STM/RMT adjusting autoyast file)
 * *NOTE* Host server should be a SLE or an openSUSE (script use zypper)
+* *NOTE* Host server must have PackageHub installed (provides pssh)
 * *WARNING* Running the script will erase all previous deployment of the same cluster (but not another cluster already deployed)
 * *NOTE* Scripts are written in shell to simplify external contribution and modification, of course this choice lead to some technical limitation but the main advantage is to be able to deploy it quickly on any kind of product without any missing dependencies.
 
