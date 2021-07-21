@@ -21,9 +21,9 @@ check_load_config_file
 # Install all needed Hypervisors tools
 install_virtualization_stack() {
     echo $I "############ START install_virtualization_stack #############"
-    echo "- patterns-sles-${HYPERVISOR}_server patterns-sles-${HYPERVISOR}_tools and restart libvirtd" $O
-    zypper in -y patterns-sles-${HYPERVISOR}_server
-    zypper in -y patterns-sles-${HYPERVISOR}_tools
+    echo "- patterns-server-${HYPERVISOR}_server patterns-server-${HYPERVISOR}_tools and restart libvirtd" $O
+    zypper in -y patterns-server-${HYPERVISOR}_server
+    zypper in -y patterns-server-${HYPERVISOR}_tools
     echo "- Restart libvirtd"
     systemctl restart libvirtd
 }
@@ -54,6 +54,7 @@ ssh_root_key() {
 # Connect as root in VMguest without Password, copy root host key
 # pssh will be used
 # Command from Host
+# Requires PackageHub in SLE 15
 prepare_remote_pssh() {
     echo $I "############ START prepare_remote_pssh #############"
     echo "- Install pssh and create ${PSSHCONF}" $O
@@ -112,10 +113,10 @@ EOF
 	MAC=`(echo ${NODENAME}${CURRENT}|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
 	if [ ${CURRENT} -lt "10" ]; then
 	    echo "<host mac=\"${MAC}\" name=\"${NODENAME}${CURRENT}.${NODEDOMAIN}\" ip=\"${NETWORK}.10${CURRENT}\" />" >> /etc/libvirt/qemu/networks/${NETWORKNAME}.xml
-	else    
+	else
 	    echo "<host mac=\"${MAC}\" name=\"${NODENAME}${CURRENT}.${NODEDOMAIN}\" ip=\"${NETWORK}.1${CURRENT}\" />" >> /etc/libvirt/qemu/networks/${NETWORKNAME}.xml
 	fi
-    done	
+    done
     echo "    </dhcp>
   </ip>
 </network>" >> /etc/libvirt/qemu/networks/${NETWORKNAME}.xml
@@ -127,10 +128,10 @@ EOF
     virsh net-start ${NETWORKNAME}
 }
 
-# Create an SHARE pool on the host 
+# Create an SHARE pool on the host
 prepare_SHARE_pool() {
     echo $I "############ START prepare_SHARE_pool" $O
-# Create a shared pool 
+# Create a shared pool
     virsh pool-list --all | grep ${SHARENAME} > /dev/null
     if [ $? == "0" ]; then
     	echo "- Destroy current pool ${SHARENAME}"
@@ -201,7 +202,7 @@ check_host_config() {
 echo $I "############ PREPARE HOST #############"
 echo "  !! WARNING !! "
 echo "  !! WARNING !! "
-echo 
+echo
 echo "  This will remove any previous Host configuration for VM guests and testing"
 echo
 echo "########################################"$O
@@ -230,8 +231,8 @@ case "$1" in
 	;;
     all)
 	ssh_root_key
-	#install_virtualization_stack
-	#prepare_remote_pssh
+	install_virtualization_stack
+	prepare_remote_pssh
 	prepare_etc_hosts
 	prepare_virtual_network
 	prepare_SHARE_pool
@@ -241,7 +242,7 @@ case "$1" in
     *)
         echo "
      Usage: $0 {ssh|pssh|vtstack|etchosts|virtualnet|SHAREpool|autoyastimage|all}
-     
+
  vtstack
     install virtualization tools and restart libvirtd
 
