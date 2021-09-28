@@ -1,5 +1,6 @@
 #!/bin/sh
 CONF="vm.conf"
+SCCDATA="SCCDATA.conf"
 
 ## color
 # NORMAL
@@ -23,6 +24,17 @@ if [ -f $CDIR/${CONF} ]; then
     source ${CDIR}/${CONF}
 else
     echo "!! ${CONF} not found in ${CDIR} path !!"
+    exit 1
+fi
+if [ -f $CDIR/${SCCDATA} ]; then
+    source ${CDIR}/${SCCDATA}
+else
+    echo "!! ${SCCDATA} not found in ${CDIR} path !!"
+    echo "!! Please create one but never push this file in the git repo !!"
+    echo ""
+    echo "Typical content of this file: ${SCCDATA}"
+    echo "SCCREGCODE=YOUR_SCC_REG_CODE"
+    echo "VERSION=15.3"
     exit 1
 fi
 }
