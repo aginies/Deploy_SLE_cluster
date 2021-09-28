@@ -94,6 +94,7 @@ prepare_etc_hosts() {
 prepare_virtual_network() {
     echo $I "############ START prepare_virtual_network #############"
     echo "- Prepare virtual network (/etc/libvirt/qemu/networks/${NETWORKNAME}.xml)" $O
+    UUID=`uuidgen`
     cat > /etc/libvirt/qemu/networks/${NETWORKNAME}.xml << EOF
 <network>
   <name>${NETWORKNAME}</name>
