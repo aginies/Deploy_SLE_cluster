@@ -76,7 +76,7 @@ slurm_configuration() {
     echo "- Get /etc/slurm/slurm.conf from ${NODENAME}1"
     scp root@${NODENAME}1:/etc/slurm/slurm.conf .
 
-    echo "- Prepare slurm.con file"
+    echo "- Prepare slurm.conf file"
     perl -pi -e "s/ClusterName.*/ClusterName=linuxsuse/g" slurm.conf
     perl -pi -e "s/ControlMachine.*/ControlMachine=${NODENAME}1/" slurm.conf
     perl -pi -e "s/#BackupController.*/BackupController=${NODENAME}2/" slurm.conf
