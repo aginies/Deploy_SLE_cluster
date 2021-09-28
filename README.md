@@ -28,6 +28,7 @@ https://github.com/aginies/Deploy_SLE_cluster.git
 ## Install / HOWTO
 
 * Clone this repository
+* You must be root to use this scripts
 * Adjust VARS in **vm.conf** file (or create a link from your configuration to this link)
 * Create **SCCDATA.conf** file and populate it, ie:
 	SCCREGCODE=YOUR_SCC_REG_CODE
