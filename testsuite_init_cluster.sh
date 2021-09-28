@@ -51,6 +51,15 @@ echo $I "############ START enable_DVD_media"$O
     done
 }
 
+enable_SCC_repo() {
+echo $I "############ START enable_SCC_repo"$O
+    for i in `seq 1 $NBNODE`
+    do
+	exec_on_node ${NODENAME}${i} "SUSEConnect -r ${SCCREGCODE}"
+	exec_on_node ${NODENAME}${i} "SUSEConnect -p PackageHub/$VERSION/$HOSTTYPE"
+    done
+}
+
 ganglia_web() {
     echo $I "############ START ganglia_web"
     echo "- Enable php7 and restart apache2" $O
@@ -223,6 +232,9 @@ case "$1" in
     media)
 	enable_DVD_media
 	;;
+    scc)
+	enable_SCC_repo
+	;;
     nodeslist)
     	scp_nodes_list
     	;;
@@ -256,6 +268,9 @@ Usage: $0
 
  media
     enable DVD media on all nodes
+
+ scc
+    enable SCC repo and add PackageHub repo
 
  munge
     copy munger.key from ${NODENAME}1 to all other nodes
