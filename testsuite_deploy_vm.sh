@@ -85,6 +85,7 @@ install_vm() {
 	   --extra-args ${EXTRAARGS} \
 	   --watchdog i6300esb,action=poweroff \
 	   --console pty,target_type=virtio \
+	   --rng /dev/urandom \
 	   --check all=off
 }
 	  # --boot cdrom \
