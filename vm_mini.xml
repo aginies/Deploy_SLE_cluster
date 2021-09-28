@@ -273,15 +273,17 @@
       <package>autoyast2</package>
       <package>mrsh-rsh-server-compat</package>
       <package>hwloc</package>
-      <package>ganglia-web</package>
       <package>cpuid</package>
       <package>conman</package>
+      <!--
+      <package>ganglia-web</package>
       <package>pdsh-netgroup</package>
       <package>pdsh-slurm</package>
       <package>patterns-hpc-libraries</package>
       <package>patterns-hpc-workload_server</package>
       <package>patterns-hpc-development_node</package>
       <package>patterns-hpc-compute_node</package>
+      -->
     </packages>
   </software>
   <host>
