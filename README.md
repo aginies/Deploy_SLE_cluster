@@ -6,7 +6,7 @@ This is a semi-automatic script, which means that it will stop on some steps, an
 
 This scripts will configure:
 * an host (by default KVM)
-* NB nodes ready (default is 5)
+* NB nodes ready (default is 4)
 
 All configurations files on the host are dedicated for this cluster, which means
 this should not interact or destroy any other configuration (pool, net, etc...)
