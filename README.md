@@ -68,6 +68,42 @@ This script will install all nodes with needed data
 * install all VM (using a screen)
 * display information how to copy host root key to nodes (VM)
 
+**Warning** A classical issue while deploying VM could be the virtual network.
+Run the script like this to debug:
+```
+bash -x testsuite_deploy_vm.sh
+```
+
+If no VM start to install, grab the **virt-install** command line and paste it 
+into a root console:
+```
+linux-5530:~/github/Deploy_SLE_cluster #  virt-install --name sle15sp31 --ram 4096 --vcpus 2 --virt-type kvm --os-variant sles12sp3 --controller scsi,model=virtio-scsi --network network=slehpcsp3,mac=02:89:89:85:05:a1 --graphics vnc,keymap=fr --disk path=/data/TEST/images/sle15sp3/nodes_images/sle15sp31.qcow2,format=qcow2,bus=virtio,cache=none --disk path=/data/TEST/images/sle15sp3/commondisk/commondisk.img,shareable=on,bus=virtio --disk path=/data/TEST/images/sle15sp3/vm_xml.raw,shareable=on,bus=virtio --disk path=,shareable=on,device=cdrom --disk path=/data/ISO/SLE-15-SP3-Full-x86_64-Buildxxxxx-Media1.iso,shareable=on,device=cdrom --location /data/ISO/SLE-15-SP3-Full-x86_64-Buildxxxxx-Media1.iso --extra-args autoyast=device://vdc/vm.xml --watchdog i6300esb,action=poweroff --console pty,target_type=virtio --rng /dev/urandom --check all=off 
+Setting input-charset to 'UTF-8' from locale.
+WARNING  Graphics requested but DISPLAY is not set. Not running virt-viewer.
+WARNING  No console to launch for the guest, defaulting to --wait -1
+
+Starting install...
+Setting input-charset to 'UTF-8' from locale.
+Retrieving file linux...                                                                     | 8.6 MB  00:00:00     
+Setting input-charset to 'UTF-8' from locale.
+Retrieving file initrd...                                                                    |  99 MB  00:00:00     
+ERROR    Network not found: no network with matching name 'slehpcsp3'
+Domain installation does not appear to have been successful.
+If it was, you can restart your domain by running:
+  virsh --connect qemu:///system start sle15sp31
+otherwise, please restart your installation.
+```
+
+You can see the:
+```
+ERROR    Network not found: no network with matching name 'slehpcsp3'
+```
+
+Run the **testsuite_host_conf.sh** with **bash -x** to find the issue:
+```
+bash -x testsuite_host_conf.sh virtualnet
+```
+
 ### testsuite_init_cluster.sh
 Finish the nodes installation and run some tests.
 
