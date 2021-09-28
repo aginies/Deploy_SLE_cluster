@@ -3,7 +3,7 @@
 #
 #
 #########################################################
-## MPI TEST
+## GRAFANA PROMETHEUS TEST
 #########################################################
 
 if [ -f ../functions ] ; then
@@ -117,7 +117,7 @@ Select a Prometheus data source drop-down box
 ##########################
 ##########################
 
-echo $I "############ GRAFANA TEST SCENARIO #############"
+echo $I "############ GRAFANA PROMETHEUS TEST SCENARIO #############"
 echo
 echo " One node will be grafana/prometheus server (${NODENAME}1)"
 echo $O
@@ -151,6 +151,16 @@ case $1 in
     dashboard)
 	dashboard
 	;;
+    all)
+	install_grafana_prometheus
+	start_prometheus
+	start_grafana
+	monitor_slurm
+	monitor_workload
+	prometheus_config
+	restart_prometheus
+	dashboard
+        ;;
     *)
 	echo "
 usage of $0
@@ -181,6 +191,9 @@ PackageHub repository is mandatory to be able to install needed packages
 
  dashboard
  	some explanation about dashboarding in grafana
+
+ all
+ 	try to do all steps in correct order
 "
 	;;
 esac
