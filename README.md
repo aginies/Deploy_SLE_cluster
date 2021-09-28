@@ -29,6 +29,9 @@ https://github.com/aginies/Deploy_SLE_cluster.git
 
 * Clone this repository
 * Adjust VARS in vm.conf file (or create a link from your configuration to this link)
+* create SCCDATA.conf file and populate it, ie:
+	SCCREGCODE=YOUR_SCC_REG_CODE
+	VERSION=15.3
 * 1) Prepare the host: testsuite_host_conf.sh
 * 2) Deploy VM: testsuite_deploy_vm.sh
 * 3) Init the cluster: testsuite_init_cluster.sh
