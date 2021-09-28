@@ -81,14 +81,15 @@ prometheus_config() {
     scrape_interval: 30s
     scrape_timeout: 30s
     static_configs:
-      - targets: ['localhost:8080']
+      - targets: ['${NODENAME}1:8080']
 
   - job_name: node-exporter
     static_configs:
-      - targets: ['192.168.11.103:9100']
-      - targets: ['192.168.11.102:9100']
-      - targets: ['localhost:9100']
 EOF
+    for i in `seq 1 $NBNODE`
+    do	    
+        echo "      - targets: ['${NODENAME}${i}:9100']" >> prometheus.yml
+    done
     scp_on_node prometheus.yml "${NODENAME}1:/etc/prometheus/prometheus.yml" prometheus.yml
     else
 	echo "- seems prometheus.yml already contains needed modification"
