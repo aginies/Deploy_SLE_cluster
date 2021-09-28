@@ -17,7 +17,7 @@ check_load_config_file other
 
 install_grafana_prometheus() {
     echo $I "############ START install_grafana_prometheus" $O
-    exec_on_node ${NODENAME}1 "zypper in -y golang-github-prometheus-prometheus grafana"
+    exec_on_node ${NODENAME}1 "zypper in -y golang-github-prometheus-prometheus grafana wget"
 }
 
 start_prometheus() {
@@ -48,11 +48,11 @@ monitor_slurm() {
     echo $I "############ START monitor_slurm" $O
     for i in `seq 1 $NBNODE`
     do
-	exec_on_node ${NODENAME}${i} "zypper in golang-github-vpenso-prometheus_slurm_exporter"
+	exec_on_node ${NODENAME}${i} "zypper in -y golang-github-vpenso-prometheus_slurm_exporter"
 	exec_on_node ${NODENAME}${i} "systemctl enable prometheus-slurm_exporter"
 	exec_on_node ${NODENAME}${i} "systemctl start prometheus-slurm_exporter"
     done
-    exec_on_node ${NODENAME}1 "wget exec_on_node ${NODENAME}1:8080/metrics --output-document=-"
+    exec_on_node ${NODENAME}1 "wget ${NODENAME}1:8080/metrics --output-document=-"
     echo "http://${NODENAME}1:8080/metrics"
     echo "dashboard ID 4323"
 }
@@ -61,7 +61,7 @@ monitor_workload() {
     echo $I "############ START monitor_workload" $O
     for i in `seq 1 $NBNODE`
     do
-	exec_on_node ${NODENAME}${i} "zypper in golang-github-prometheus-node_exporter"
+	exec_on_node ${NODENAME}${i} "zypper in -y golang-github-prometheus-node_exporter"
 	exec_on_node ${NODENAME}${i} "systemctl enable prometheus-node_exporter"
 	exec_on_node ${NODENAME}${i} "systemctl start prometheus-node_exporter"
     done
