@@ -33,6 +33,9 @@ https://github.com/aginies/Deploy_SLE_cluster.git
 * Create **SCCDATA.conf** file and populate it, ie:
 	SCCREGCODE=YOUR_SCC_REG_CODE
 	VERSION=15.3
+
+:bomb: **Warning** never push this file in git repo, this contains your private SCC regkey !
+
 1. Prepare the host: **testsuite_host_conf.sh**
 2. Deploy VM: **testsuite_deploy_vm.sh**
 3. Init the cluster: **testsuite_init_cluster.sh**
@@ -68,7 +71,7 @@ This script will install all nodes with needed data
 * install all VM (using a screen)
 * display information how to copy host root key to nodes (VM)
 
-**Warning** A classical issue while deploying VM could be the virtual network.
+:bomb: **Warning** A classical issue while deploying VM could be the virtual network.
 Run the script like this to debug:
 ```
 bash -x testsuite_deploy_vm.sh
