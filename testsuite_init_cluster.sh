@@ -262,12 +262,14 @@ Usage: $0
 
  slurm
     configure slurm on all nodes (and enable and start the service)
+    (you need to install it before)
 
  checkuser
     check user/group id for slurm and munge on all nodes
 
  ganglia
     configure apache and get ganglia up
+    (no more supported starting from SLE15SP4)
 
  start
     start all nodes
