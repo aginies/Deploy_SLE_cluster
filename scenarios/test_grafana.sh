@@ -24,15 +24,14 @@ start_prometheus() {
     echo $I "############ START start_prometheus" $O
     exec_on_node ${NODENAME}1 "systemctl enable prometheus"
     exec_on_node ${NODENAME}1 "systemctl start prometheus"
+    exec_on_node ${NODENAME}1 "wget localhost:9090/config --output-document=-"
     echo ""
     echo " - Prometheus config available at http://${NODENAME}1:9090/config"
-    exec_on_node ${NODENAME}1 "wget localhost:9090/config --output-document=-"
 }
-
 
 restart_prometheus() {
     echo $I "############ START restart_prometheus" $O
-    exec_on_node ${NODENAME}1 "systemctl start prometheus"
+    exec_on_node ${NODENAME}1 "systemctl restart prometheus"
 }
 
 start_grafana() {
@@ -53,6 +52,7 @@ monitor_slurm() {
 	exec_on_node ${NODENAME}${i} "systemctl start prometheus-slurm_exporter"
     done
     exec_on_node ${NODENAME}1 "wget ${NODENAME}1:8080/metrics --output-document=-"
+    echo ""
     echo "http://${NODENAME}1:8080/metrics"
     echo "dashboard ID 4323"
 }
@@ -66,6 +66,7 @@ monitor_workload() {
 	exec_on_node ${NODENAME}${i} "systemctl start prometheus-node_exporter"
     done
     exec_on_node ${NODENAME}1 "wget exec_on_node ${NODENAME}1:9100/metrics --output-document=-"
+    echo ""
     echo "http://${NODENAME}1:9100/metrics"
     echo "dashboard ID 405"
 }
@@ -77,6 +78,7 @@ prometheus_config() {
     grep slurm-exporter prometheus.yml
     if [ "$?" -ne "0" ]; then
     cat >> prometheus.yml <<EOF
+
   - job_name: slurm-exporter
     scrape_interval: 30s
     scrape_timeout: 30s
