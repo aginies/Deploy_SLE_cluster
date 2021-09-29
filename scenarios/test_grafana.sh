@@ -101,12 +101,18 @@ EOF
 
 dashboard() {
     echo $I "############ START dashboard" $O
-    echo "Log in to the Grafana web server at http://${NODENAME}1:3000
+    echo "Log in to the Grafana web server at http://${NODENAME}1:3000 (default: admin/admin)
+
+Add Prometheus:
+On the left panel, select the gear icon and click Data Sources.
+Click Add data source.
+Find Prometheus and click Select.
+In the URL field, enter http://localhost:9090
+
 Slurm:
 In the Import via grafana.com field, enter the dashboard ID 4323, then click Load
 Select a Prometheus data source drop-down box
-"
-    echo "
+
 Workload:
 In the Import via grafana.com field, enter the dashboard ID 405, then click Load.
 Select a Prometheus data source drop-down box
