@@ -60,6 +60,24 @@ echo $I "############ START enable_SCC_repo"$O
     done
 }
 
+update_nodes() {
+echo $I "############ START update_nodes"$O
+    for i in `seq 1 $NBNODE`
+    do
+#	exec_on_node ${NODENAME}${i} "zypper ref"
+	echo "AA"
+    done
+    for i in `seq 1 $NBNODE`
+    do
+        echo ${NODENAME}${i} zypper up -y
+    	exec_on_node_screen ${NODENAME}${i} "zypper up -y"
+    done
+    echo " - Update running in background, check in screen:"
+    screen -list
+    echo " screen -r SCREENID"
+}
+
+
 ganglia_web() {
     echo $I "############ START ganglia_web"
     echo "- Enable php7 and restart apache2" $O
@@ -235,6 +253,9 @@ case "$1" in
     scc)
 	enable_SCC_repo
 	;;
+    update)
+    	update_nodes
+	;;
     nodeslist)
     	scp_nodes_list
     	;;
@@ -271,6 +292,9 @@ Usage: $0
 
  scc
     enable SCC repo and add PackageHub repo
+ 
+ update
+    update all nodes with latest packages
 
  munge
     copy munger.key from ${NODENAME}1 to all other nodes

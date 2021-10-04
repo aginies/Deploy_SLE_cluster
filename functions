@@ -56,6 +56,7 @@ install_package() {
 # execute a command on a NODE from host
 exec_on_node() {
     # first arg is NODE name, second arg is command
+    # third arg is optionnal, will ignore returning an error in case output command result is not 0
     if [ $# -lt 2 ]
     then
 	echo $F "! Two args needed (NODE / CMD / OPTIONNAL_IGNORE); Exiting" $O
@@ -78,6 +79,22 @@ exec_on_node() {
 	    read
 	fi
     fi
+}
+
+exec_on_node_screen() {
+    # first arg is NODE name, second arg is command
+    if [ $# -lt 2 ]
+    then
+	echo $F "! Two args needed (NODE / CMD); Exiting" $O
+        exit 1
+    fi
+    NODE="$1"
+    CMD="$2"
+    HASH=`echo $NODE$CMD |md5sum | cut -d " " -f 1`
+    # avoid: No pseudo-tty detected! Use -t option to ssh if calling remotely
+#    screen -A -d -m -S sle15sp332390dc28adf81c4f7d1b3ecf9f8c76cd ssh sle15sp33 zypper ref
+    echo "${NODE}: screen -A -d -m -S ${NODE}-${HASH} ssh -T -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ${NODE} ${CMD}";
+    screen -A -d -m -S ${NODE}${HASH} ssh -T -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ${NODE} ${CMD}
 }
 
 exec_pssh() {
