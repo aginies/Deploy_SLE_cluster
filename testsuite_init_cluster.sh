@@ -96,10 +96,16 @@ ganglia_web() {
 
 }
 
+slurm_install() {
+    for i in `seq 1 $NBNODE`
+    do
+	exec_on_node ${NODENAME}${i} "zypper in -y slurm"
+    done
+}
+
 slurm_configuration() {
-
     echo $I "############ START create a slurm_configuration" $O
-
+    slurm_install
     echo "- Get /etc/slurm/slurm.conf from ${NODENAME}1"
     scp root@${NODENAME}1:/etc/slurm/slurm.conf .
 
@@ -207,6 +213,9 @@ check_user() {
 
 create_test_user() {
     echo $I "############ START create_test_user" $O
+    echo " - You need to have slurm install before or you will have an error!"
+    echo " - Why? the user 'test' is part of the slurm group" 
+    exec_on_node ${NODENAME}1 "ls -1 /etc/slurm/slurm.conf"
     for i in `seq 1 $NBNODE`
     do
         exec_on_node ${NODENAME}${i} "useradd -d /home/test -g users -G slurm -M -p "a" -u 667 test" IGNORE=1
@@ -323,7 +332,7 @@ Usage: $0
     Copy Cluster Internal key (from ${NODENAME}1) to all other HA nodes
 
  testuser
-    create a test user
+    create a test user (you need to install slurm before!)
 
  install
     install package name (or list)
