@@ -75,7 +75,7 @@ prepare_etc_hosts() {
     if [ $? == "1" ]; then
         echo "- Prepare /etc/hosts (adding nodes)"
 	CURRENT=0
-	for i in `seq 1 $NBNODE`
+	for i in `seq 1 $MAXNBNODE`
 	do
 	    ((++CURRENT))
 	    if [ ${CURRENT} -lt "10" ]; then
@@ -108,7 +108,7 @@ prepare_virtual_network() {
       <range start='${NETWORK}.188' end='${NETWORK}.254'/>
 EOF
     CURRENT=0
-    for i in `seq 1 $NBNODE`
+    for i in `seq 1 $MAXNBNODE`
     do
 	((++CURRENT))
 	MAC=`(echo ${NODENAME}${CURRENT}|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`

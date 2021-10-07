@@ -115,68 +115,123 @@ copy_ssh_key() {
     rm -vf /root/.ssh/known_hosts"
 }
 
+update_nb_nodes() {
+    ((++NBNODE))
+    perl -pi -e "s/^NBNODE=.*/NBNODE=${NBNODE}/" $CONF
+}
+
 ##########################
 ##########################
 ### MAIN
 ##########################
 ##########################
 
-# CLEAN everything
-cleanup_vm
+echo $I "####### PREPARE TO DEPLOY VM #########"
+echo "  !! WARNING !! "
+echo "  !! WARNING !! "
+echo
+echo "########################################"$O
 
-# create the pool
-create_pool ${LIBVIRTPOOL}
-
-# verify everything is available
-check_before_install
-
-# Install VM 1
-NAME="${NODENAME}1"
-VMDISK="${STORAGEP}/${LIBVIRTPOOL}/${NAME}.qcow2"
-MAC=`(echo ${NODENAME}1|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
-install_vm ${MAC}
-
-# install all other VM (minimal autoyast file)
-# Use a minimal installation without X for node2 and node3 etc...
-EXTRAARGS="autoyast=device://vdc/vm2.xml"
-
-for nb in `seq 2 $NBNODE` 
-do
-    # Install VM
-	export NAME="${NODENAME}${nb}"
-	export VMDISK="${STORAGEP}/${LIBVIRTPOOL}/${NAME}.qcow2"
-        MAC=`(echo ${NODENAME}${nb}|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
-	grep ${MAC} /etc/libvirt/qemu/networks/${NETWORKNAME}.xml
-	if [ "$?" -ne "0" ]; then 
+case "$1" in
+    # CLEAN everything
+    cleanup)
+	cleanup_vm
+	;;
+    # create the pool
+    pool)
+	create_pool ${LIBVIRTPOOL}
+	;;
+    # verify everything is available
+    installvm)
+	check_before_install
+	# Install VM 1
+	NAME="${NODENAME}1"
+	VMDISK="${STORAGEP}/${LIBVIRTPOOL}/${NAME}.qcow2"
+	MAC=`(echo ${NODENAME}1|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
+	install_vm ${MAC}
+	
+	# install all other VM (minimal autoyast file)
+	# Use a minimal installation without X for node2 and node3 etc...
+	EXTRAARGS="autoyast=device://vdc/vm2.xml"
+	
+	for nb in `seq 2 $NBNODE` 
+	do
+	    # Install VM
+	    export NAME="${NODENAME}${nb}"
+	    export VMDISK="${STORAGEP}/${LIBVIRTPOOL}/${NAME}.qcow2"
+            MAC=`(echo ${NODENAME}${nb}|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
+	    grep ${MAC} /etc/libvirt/qemu/networks/${NETWORKNAME}.xml
+	    if [ "$?" -ne "0" ]; then 
 		echo
 		echo " !!!! ${MAC} is missing from /etc/libvirt/qemu/networks/${NETWORKNAME}.xml !!!"
 		echo " !!!! EXPECT error in IP or Hostname for node ${NODENAME}${nb}"
 		echo
 		echo " 		PRESS ENTER TO CONTINUE"
 		read
+	    fi
+	    install_vm ${MAC}
+	done
+	;;
+    addvm)
+	# Install VM
+	if [ $# -lt 2 ];
+	then 	
+	    echo ""
+	    echo "! Please enter VM number! Exiting" ; 
+	    echo ""
+	    echo "Currently VM deployed are:"
+	    ls -1 ${STORAGEP}/${LIBVIRTPOOL}/${NAME}*.qcow2
+	    exit 1; 
 	fi
-	echo
-	echo "########################################################################"
-	echo
-	echo " Please [ENTER] twice to launch another install of VM"
-	echo "  (Next VM will be ${NODENAME}${nb})"
-	echo
-	echo "########################################################################"
+	export NAME="${NODENAME}${2}"
+	export VMDISK="${STORAGEP}/${LIBVIRTPOOL}/${NAME}.qcow2"
+        MAC=`(echo ${NODENAME}${2}|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')`
+	grep ${MAC} /etc/libvirt/qemu/networks/${NETWORKNAME}.xml
+	if [ "$?" -ne "0" ]; then 
+	    echo
+	    echo " !!!! ${MAC} is missing from network pool /etc/libvirt/qemu/networks/${NETWORKNAME}.xml !!!"
+	    echo " !!!! EXPECT error in IP or Hostname for node ${NODENAME}${2}"
+	fi
+        echo
+        echo " 		PRESS ENTER TO CONTINUE AND INSTALL VM ${NODENAME}${2}"
 	read
-	read
-	install_vm ${MAC}
-done
+	#install_vm ${MAC}
+	update_nb_nodes
+	;;
+    info)
+	# Check VM
+	virsh list --all
+	# Get IP address
+	virsh net-dhcp-leases ${NETWORKNAME}
+	# List installation in progress
+	screen -list
+	copy_ssh_key
+	;;
+    all)
+	cleanup
+	pool
+	installvm
+	info	
+	;;
+    *)
+	echo "
+	Usage: $0 {cleanup|installvm|addvm|info|pool}
 
-# Check VM
-virsh list --all
+cleanup
+	delete all VM and VM storage
 
-# Get IP address
-virsh net-dhcp-leases ${NETWORKNAME}
+pool
+	create the pool storage for VM
 
-# List installation in progress
-screen -list
+installvm
+	install all VM ($NBNODE)
 
-copy_ssh_key
+addvm
+	install one more VM (up to $MAXNBNODE)
 
-
-#EXTRA_SCRIPT_AFTER_INSTALL
+info
+	display info about network, storage, ssh key etc...
+"
+	exit 1
+	;;
+esac
