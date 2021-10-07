@@ -56,20 +56,11 @@ run_server_dup() {
 	  LISTNODE=${VALUE}
       fi
   done
-  echo "LISTNODE: ${LISTNODE}"
-  echo "- Manual Launch:"
-  echo "ssh ${NODENAME}1"
-  echo "ssh ${NODENAME}1 \"dolly -s -v -o /root/dolly.log -I /dev/${DATA} -O /dev/${DATA} -H ${LISTNODE}"
   # echo "dolly -s -v -o /root/dolly.log -f /etc/dolly.cfg"
-  # echo
-  echo "- Using Screen:"
-  echo "ssh ${NODENAME}1 \"screen -d -m dolly -s -v -o /root/dolly.log -I /dev/${DATA} -O /dev/${DATA} -H ${LISTNODE}"
-  #echo "ssh ${NODENAME}1 \"screen -d -m dolly -s -v -o /root/dolly.log -f /etc/dolly.cfg\""
   echo
-  echo " PRESS ENTER TWICE TO LAUNCH IT"
-  read
-  read
-  echo "ssh ${NODENAME}1 \"screen -d -m dolly -s -v -o /root/dolly.log -I /dev/${DATA} -O /dev/${DATA} -H ${LISTNODE}"
+  echo "Log on ${NODENAME}1 and run dolly:"
+  echo "ssh ${NODENAME}1"
+  echo "dolly -s -v -o /root/dolly.log -I /dev/${DATA} -O /dev/${DATA} -H ${LISTNODE}"
 }
 
 run_server_dup_plus() {
