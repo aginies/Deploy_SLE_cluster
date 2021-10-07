@@ -30,7 +30,7 @@ TESTDIR="/mnt/test"
 SIZEM="15120"
 
 # BIG CLUSTER CONFIG !
-NBNODE=3
+NBNODE=4
 IMAGENB=${NBNODE}
 
 
@@ -47,17 +47,29 @@ prepare_duplication() {
 run_server_dup() {
   echo $I "############ START run_server_dup" $O
   echo $I "- Start server on node ${NODENAME}1" $O
+  for i in `seq 2 $NBNODE`
+  do
+      VALUE=`echo -n ${NODENAME}${i}`
+      if [ ! -z "${LISTNODE}" ]; then
+	  LISTNODE=${LISTNODE},${VALUE}
+      else
+	  LISTNODE=${VALUE}
+      fi
+  done
+  echo "LISTNODE: ${LISTNODE}"
   echo "- Manual Launch:"
   echo "ssh ${NODENAME}1"
-  echo "dolly -s -v -o /root/dolly.log -f /etc/dolly.cfg"
-  echo
+  echo "ssh ${NODENAME}1 \"dolly -s -v -o /root/dolly.log -I /dev/${DATA} -O /dev/${DATA} -H ${LISTNODE}"
+  # echo "dolly -s -v -o /root/dolly.log -f /etc/dolly.cfg"
+  # echo
   echo "- Using Screen:"
-  echo "ssh ${NODENAME}1 \"screen -d -m dolly -s -v -o /root/dolly.log -f /etc/dolly.cfg\""
+  echo "ssh ${NODENAME}1 \"screen -d -m dolly -s -v -o /root/dolly.log -I /dev/${DATA} -O /dev/${DATA} -H ${LISTNODE}"
+  #echo "ssh ${NODENAME}1 \"screen -d -m dolly -s -v -o /root/dolly.log -f /etc/dolly.cfg\""
   echo
   echo " PRESS ENTER TWICE TO LAUNCH IT"
   read
   read
-  ssh ${NODENAME}1 "screen -d -m dolly -s -v -f /etc/dolly.cfg"
+  echo "ssh ${NODENAME}1 \"screen -d -m dolly -s -v -o /root/dolly.log -I /dev/${DATA} -O /dev/${DATA} -H ${LISTNODE}"
 }
 
 run_server_dup_plus() {
@@ -82,7 +94,7 @@ run_duplication() {
    echo $I "- Start client on all other nodes" $O
    for i in `seq 2 $NBNODE`
    do
-	echo "- Killall -9 dolly on nodes ${NODENAME}${i} in case off..."
+	echo "- Killall -9 dolly on nodes ${NODENAME}${i} in case of..."
 	ssh ${NODENAME}${i} "killall -9 dolly"
 	echo "ssh ${NODENAME}${i} \"screen -d -m dolly -v\""
 	ssh ${NODENAME}${i} "screen -d -m dolly -v"
@@ -95,7 +107,7 @@ run_duplication_plus() {
    echo $I "- Start client on all other nodes" $O
    for i in `seq 2 $NBNODE`
    do
-	echo "- Killall -9 dollyC on nodes ${NODENAME}${i} in case off..."
+	echo "- Killall -9 dollyC on nodes ${NODENAME}${i} in case of..."
 	ssh ${NODENAME}${i} "killall -9 dollyC"
 	echo "ssh ${NODENAME}${i} \"screen -d -m dollyC -v\""
 	ssh ${NODENAME}${i} "screen -d -m dollyC"
@@ -349,6 +361,8 @@ MAC HOST: ${NETMACHOST}
 Brdige used: ${BRIDGE}
 
 Nodename: ${NODENAME}
+
+(below modify VAR directly in this script)
 Disk added to test duplication: ${DATA}
 Disk name: ${diskname}
 Dir where disk are stored: ${CLUSTERDUP}
@@ -363,8 +377,8 @@ INFO : Default root pass on Alpine VM is empty
 
 usage of $0 
 
- prepare (no mandatory)
-	copy dolly on all nodes (no needed with alpine VM)
+ prepare (not mandatory)
+	copy dolly on all nodes (not needed with alpine VM)
 
  start
 	start all VM
@@ -404,7 +418,7 @@ usage of $0
 	run dolly server on node ${NODENAME}1
 
  runc
-	run dolly client on all nodes
+	run dolly client on all nodes (psmisc must be installed !)
 
  runsp
 	run dollyS server on node ${NODENAME}1
