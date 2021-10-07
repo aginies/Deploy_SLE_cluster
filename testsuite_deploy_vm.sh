@@ -195,8 +195,19 @@ case "$1" in
         echo
         echo " 		PRESS ENTER TO CONTINUE AND INSTALL VM ${NODENAME}${2}"
 	read
-	#install_vm ${MAC}
+	install_vm ${MAC}
 	update_nb_nodes
+	echo " You need to re-run some script to add you node in the host config and in the cluster service"
+	echo "./testsuite_host_conf.sh ssh"
+	echo "./testsuite_host_conf.sh pssh"
+	echo "./testsuite_init_cluster.sh hostname
+       			scc
+		       	munge
+			slurm
+			nodeslist
+			sshkeynode
+			testuser
+			"
 	;;
     info)
 	# Check VM
