@@ -60,6 +60,16 @@ echo $I "############ START enable_SCC_repo"$O
     done
 }
 
+cleanup_zypper_repo() {
+echo $I "############ START cleanup_zypper_repo"$O
+    for i in `seq 1 $NBNODE`
+    do
+	exec_on_node ${NODENAME}${i} "SUSEConnect --cleanup"
+	exec_on_node ${NODENAME}${i} "zypper removerepo 1 2 3 4 5 6 7 8 9"
+    done
+}
+
+
 update_nodes() {
 echo $I "############ START update_nodes"$O
     for i in `seq 1 $NBNODE`
@@ -262,6 +272,9 @@ case "$1" in
     scc)
 	enable_SCC_repo
 	;;
+    cleanrepo)
+	cleanup_zypper_repo
+	;;
     update)
     	update_nodes
 	;;
@@ -302,6 +315,9 @@ Usage: $0
  scc
     enable SCC repo and add PackageHub repo
  
+ cleanrepo
+    disable SCC (cleanup) and remove all zypper repo
+
  update
     update all nodes with latest packages
 
