@@ -207,6 +207,13 @@ case "$1" in
 			nodeslist
 			sshkeynode
 			testuser
+
+			Dont forget to copy your ssh key id (ie: to node sle15sp35):
+	        ssh-copy-id sle15sp35
+	
+		Edit /root/.ssh/config and add your node in the list, ie:
+		host sle15sp31 sle15sp32 sle15sp33 sle15sp34 sle15sp35
+		IdentityFile /root/.ssh/id_rsa_SLE
 			"
 	;;
     info)
