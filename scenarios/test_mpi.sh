@@ -19,7 +19,7 @@ prepare_mpi() {
     echo $I "############ START prepare_mpi" $O
     #git clone https://github.com/wesleykendall/mpitutorial
     scp_on_node mpi_hello_world.c "mpitest@${NODENAME}1:/export"
-    exec_on_node ${NODENAME}1 "zypper in -y make"
+    exec_on_node ${NODENAME}1 "zypper in -y make openmpi4-gnu-hpc-devel lua-lmod"
     exec_on_node mpitest@${NODENAME}1 "cat > /export/build_prepare_mpi.sh <<EOF
 #!/bin/sh
 module load gnu
