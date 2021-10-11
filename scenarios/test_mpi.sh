@@ -122,6 +122,14 @@ mount_export() {
     done
 }
 
+umount_export() {
+    echo $I "############ START nfs_client umount_export" $O
+    for i in `seq 2 $NBNODE`
+    do
+    exec_on_node ${NODENAME}${i} "umount /export"
+    done
+}
+
 
 back_to_start() {
     echo $I "############ START back_to_start" $O
@@ -187,7 +195,7 @@ usage of $0
 	prepare an /export dir for testing
 
  nclient
-	mount /export on all nodes	
+	isntall nfs-utils, create /export on all nodes and mount /export from ${NODENAME}1
 
  usermpi
 	create an mpitest usr on all nodes (will used /export)
@@ -195,6 +203,9 @@ usage of $0
 
  mount
 	mount /export on all nodes
+
+ umount
+	umount /export on all nodes
 
  mpib
 	compile a basic mpi test with mpicc
