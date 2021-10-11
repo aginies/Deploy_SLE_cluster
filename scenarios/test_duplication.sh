@@ -30,7 +30,7 @@ TESTDIR="/mnt/test"
 SIZEM="15120"
 
 # BIG CLUSTER CONFIG !
-NBNODE=4
+NBNODE=5
 IMAGENB=${NBNODE}
 
 
@@ -233,8 +233,8 @@ delete_pool_storage() {
 
 cmd_on_nodes() {
     echo $I "############ START cmd" $O
-    if [ -z "$1" ]; then echo "- First arg must be the command!"; exit 1; fi
-    CMD="$1"
+    if [ -z "$*" ]; then echo "- First arg must be the command!"; exit 1; fi
+    CMD="$*"
     for i in `seq 1 $NBNODE`
     do
         exec_on_node ${NODENAME}${i} "$CMD"
