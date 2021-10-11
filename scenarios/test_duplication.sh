@@ -237,7 +237,7 @@ cmd_on_nodes() {
     CMD="$1"
     for i in `seq 1 $NBNODE`
     do
-        eec_on_node ${NODENAME}${i} "$CMD"
+        exec_on_node ${NODENAME}${i} "$CMD"
     done
 }
 
