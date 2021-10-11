@@ -171,6 +171,9 @@ case $1 in
     mount)
 	mount_export
 	;;
+    umount)
+	umount_export
+	;;
     usermpi)
 	user_mpi
 	;;
