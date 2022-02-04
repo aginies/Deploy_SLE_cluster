@@ -34,7 +34,7 @@ else
     echo ""
     echo "Typical content of this file: ${SCCDATA}"
     echo "SCCREGCODE=YOUR_SCC_REG_CODE"
-    echo "VERSION=15.3"
+    echo "VERSION=15.4"
     exit 1
 fi
 }
