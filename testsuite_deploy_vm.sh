@@ -218,7 +218,7 @@ case "$1" in
 	;;
     info)
 	# Check VM
-	virsh list --all
+	virsh list
 	# Get IP address
 	virsh net-dhcp-leases ${NETWORKNAME}
 	# List installation in progress
