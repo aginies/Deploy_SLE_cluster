@@ -41,6 +41,11 @@ fi
 
 install_package() {
     echo $I "############ START install_package" $O
+    if [ $# -lt 1 ]
+    then
+        echo $F "! Package(s) name needed ! ; Exiting" $O
+        exit 1
+    fi
     PKG=$1
 #    for i in `seq 1 $NBNODE`
 #    do
