@@ -57,6 +57,10 @@ echo $I "############ START enable_SCC_repo"$O
     do
 	exec_on_node ${NODENAME}${i} "SUSEConnect -r ${SCCREGCODE}"
 	exec_on_node ${NODENAME}${i} "SUSEConnect -p PackageHub/$VERSION/$HOSTTYPE"
+	exec_on_node ${NODENAME}${i} "SUSEConnect -p sle-module-server-applications/$VERSION/$HOSTTYPE"
+	exec_on_node ${NODENAME}${i} "SUSEConnect -p sle-module-web-scripting/$VERSION/$HOSTTYPE"
+	exec_on_node ${NODENAME}${i} "SUSEConnect -p sle-module-development-tools/$VERSION/$HOSTTYPE"
+	exec_on_node ${NODENAME}${i} "SUSEConnect -p sle-module-hpc/$VERSION/$HOSTTYPE"
     done
 }
 
