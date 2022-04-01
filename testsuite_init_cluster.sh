@@ -83,8 +83,8 @@ echo $I "############ START update_nodes"$O
     done
     for i in `seq 1 $NBNODE`
     do
-        echo ${NODENAME}${i} zypper up -y
-    	exec_on_node_screen ${NODENAME}${i} "zypper up -y"
+        echo ${NODENAME}${i} "zypper up -y; zypper up -y --auto-agree-with-licenses"
+   	exec_on_node_screen ${NODENAME}${i} "zypper ref -y ; zypper up -y --auto-agree-with-licenses"
     done
     echo " - Update running in background, check in screen:"
     screen -list
