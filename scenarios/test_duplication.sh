@@ -30,17 +30,27 @@ TESTDIR="/mnt/test"
 SIZEM="15120"
 
 # BIG CLUSTER CONFIG !
-NBNODE=5
+NBNODE=4
 IMAGENB=${NBNODE}
 
+dolly_repo() {
+    echo $I "############ START dolly_repo" $O
+    for i in `seq 1 $NBNODE`
+    do
+        echo "- Node ${NODENAME}${i}:"
+	#SLE_15_SP3
+        exec_on_node_screen ${NODENAME}${i} "zypper addrepo https://download.opensuse.org/repositories/network:/cluster/SLE_${SLERELEASE}_${SPVERSION} dolly"
+    done
 
-prepare_duplication() {
-    echo $I "############ START prepare_duplication" $O
+}
+
+install_dolly() {
+    echo $I "############ START install_dolly" $O
     echo $I "-Install all tools on all nodes" $O
     for i in `seq 1 $NBNODE`
     do
 	echo "- Node ${NODENAME}${i}:"
-        scp_on_node "dolly" "root@${NODENAME}${i}:/usr/bin/"
+	exec_on_node_screen ${NODENAME}${i} "zypper in -y dolly"
     done
 }
 
@@ -56,29 +66,11 @@ run_server_dup() {
 	  LISTNODE=${VALUE}
       fi
   done
-  # echo "dolly -s -v -o /root/dolly.log -f /etc/dolly.cfg"
   echo
   echo "Log on ${NODENAME}1 and run dolly:"
   echo "ssh ${NODENAME}1"
-  echo "dolly -s -v -o /root/dolly.log -I /dev/${DATA} -O /dev/${DATA} -H ${LISTNODE}"
+  echo "dolly -dvs -H ${LISTNODE} -I /dev/${DATA} -O /dev/${DATA}"
 }
-
-run_server_dup_plus() {
-  echo $I "############ START run_server_dup_plus" $O
-  echo $I "- Start server on node ${NODENAME}1" $O
-  echo "- Manual Launch:"
-  echo "ssh ${NODENAME}1"
-  echo "dollyS -v -f /etc/dollyplus.cfg"
-  echo
-  echo "- Using Screen:"
-  echo "ssh ${NODENAME}1 \"screen -d -m dollyS -v -f /etc/dollyplus.cfg\""
-  echo
-  echo " PRESS ENTER TWICE TO LAUNCH IT"
-  read
-  read
-  ssh ${NODENAME}1 "screen -d -m dollyS -v -f /etc/dollyplus.cfg"
-}
-
 
 run_duplication() {
    echo $I "############ START run_duplication" $O
@@ -92,45 +84,6 @@ run_duplication() {
 	sleep 1
    done
 }
-
-run_duplication_plus() {
-   echo $I "############ START run_duplication_plus" $O
-   echo $I "- Start client on all other nodes" $O
-   for i in `seq 2 $NBNODE`
-   do
-	echo "- Killall -9 dollyC on nodes ${NODENAME}${i} in case of..."
-	ssh ${NODENAME}${i} "killall -9 dollyC"
-	echo "ssh ${NODENAME}${i} \"screen -d -m dollyC -v\""
-	ssh ${NODENAME}${i} "screen -d -m dollyC"
-	sleep 1
-   done
-}
-
-config_set_plus() {
-   echo $I "############ START config_set_plus" $O
-   CLIENTS=`echo $((${NBNODE}-1))`
-   cat > dollyplus.cfg <<EOF
-iofiles 1
-/dev/${DATA} > /dev/$DATA
-server ${NODENAME}1
-firstclient ${NODENAME}2
-lastclient ${NODENAME}${NBNODE}
-clients ${CLIENTS}
-EOF
-for i in `seq 2 $NBNODE`
-do
-echo "${NODENAME}${i}" >> dollyplus.cfg
-done
-echo "endconfig" >> dollyplus.cfg
-
-scp_on_node dollyplus.cfg "root@${NODENAME}1:/etc/"
-echo "- CONFIGURATION:"
-echo "################"
-cat dollyplus.cfg
-echo "################"
-rm dollyplus.cfg
-}
-
 
 config_set() {
    echo $I "############ START config_set" $O
@@ -154,26 +107,6 @@ echo "################"
 cat dolly.cfg
 echo "################"
 rm dolly.cfg
-}
-
-start_vm() {
-    echo $I "############ START start_vm" $O
-    for i in `seq 1 $NBNODE`
-    do
-	echo "- Starting domain ${NODENAME}${i}"
-	virsh start ${NODENAME}${i}
-	sleep 2
-    done
-}
-
-stop_vm() {
-    echo $I "############ START stop_vm" $O
-    for i in `seq 1 $NBNODE`
-    do
-	echo "- Stoping domain ${NODENAME}${i}"
-	virsh destroy ${NODENAME}${i}
-	sleep 1
-    done
 }
 
 create_pool_storage() {
@@ -231,16 +164,6 @@ delete_pool_storage() {
     rm -rfv ${STORAGEP}/${CLUSTERDUP}
 }
 
-cmd_on_nodes() {
-    echo $I "############ START cmd" $O
-    if [ -z "$*" ]; then echo "- First arg must be the command!"; exit 1; fi
-    CMD="$*"
-    for i in `seq 1 $NBNODE`
-    do
-        exec_on_node ${NODENAME}${i} "$CMD"
-    done
-}
-
 list_devices() {
     echo $I "############ START list_devices" $O
     for i in `seq 1 $NBNODE`
@@ -283,8 +206,8 @@ echo $O
 echo
 
 case $1 in
-    prepare)
-	prepare_duplication
+    install)
+	install_dolly
 	;;
     start)
 	start_vm
@@ -304,12 +227,6 @@ case $1 in
     configp)
         config_set_plus
         ;;
-    runsp)
-        run_server_dup_plus
-        ;;
-    runcp)
-        run_duplication_plus
-        ;;
     pool)
 	create_pool_storage
 	;;
@@ -322,14 +239,14 @@ case $1 in
     list)
 	list_devices
 	;;
-    cmd)
-	cmd_on_nodes $2
-	;;
     detach)
 	detach_dev_from_node
 	;;
     deletepool)
 	delete_pool_storage
+	;;
+    cmd)
+	cmd_on_nodes $2
 	;;
     all)
 	echo "too complex ... do manually"
@@ -368,8 +285,8 @@ INFO : Default root pass on Alpine VM is empty
 
 usage of $0 
 
- prepare (not mandatory)
-	copy dolly on all nodes (not needed with alpine VM)
+ install (not mandatory)
+	install dolly on all nodes
 
  start
 	start all VM
@@ -389,9 +306,6 @@ usage of $0
  config (/etc/dolly.cfg)
 	prepare the Dolly config file and copy it to all nodes
 
- configp (/etc/dollyplus.cfg)
-	prepare the Dolly++ config file and copy it to all nodes
-
  list
 	list all devices on all nodes (debug devices problem...)
 	all devices should use the same name for duplication
@@ -410,12 +324,7 @@ usage of $0
 
  runc
 	run dolly client on all nodes (psmisc must be installed !)
-
- runsp
-	run dollyS server on node ${NODENAME}1
-
- runcp
-	run dollyC client on all nodes
+	INFO : no more needed as dolly now use systemd socket
 
 "
 	;;
