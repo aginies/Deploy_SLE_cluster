@@ -297,8 +297,6 @@ Size of the image to duplicate in MB: ${SIZEM}
 Number of nodes to deploy (clone of node1): ${NBNODE}
 
 ################################################
-INFO : Default root pass on Alpine VM is empty
-################################################
 
 usage of $0 
 
