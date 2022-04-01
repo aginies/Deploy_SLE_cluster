@@ -40,9 +40,47 @@ case "$1" in
     slurmdownup)
 	slurm_down_up
 	;;
+    scc)
+        enable_SCC_repo
+        ;;
+    cleanrepo)
+        cleanup_zypper_repo
+        ;;
+    update)
+        update_nodes
+        ;;
+    start)
+        start_vm
+        ;;
+    stop)
+        stop_vm
+        ;;
+    install)
+        install_package $2
+        ;;
+
     *)
         echo "
-     Usage: $0 {slurmdownup}
+ media
+    enable DVD media on all nodes
+
+ scc
+    enable SCC repo and add PackageHub repo
+ 
+ cleanrepo
+    disable SCC (cleanup) and remove all zypper repo
+
+ update
+    update all nodes with latest packages
+
+ start
+    start all nodes
+
+ stop 
+    stop all nodes
+
+ install
+    install package name (or list)
 
  slurmdownup
 	scontrol update NodeName=<node> State=down Reason=hung_proc

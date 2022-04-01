@@ -178,3 +178,50 @@ stop_vm() {
     done
 }
 
+enable_DVD_media() {
+echo $I "############ START enable_DVD_media"$O
+    for i in `seq 1 $NBNODE`
+    do
+        exec_on_node ${NODENAME}${i} "zypper mr -e 1 2 3 4 5 6 7"
+    done
+}
+
+enable_SCC_repo() {
+echo $I "############ START enable_SCC_repo"$O
+    for i in `seq 1 $NBNODE`
+    do
+        exec_on_node ${NODENAME}${i} "SUSEConnect -r ${SCCREGCODE}"
+        exec_on_node ${NODENAME}${i} "SUSEConnect -p PackageHub/$VERSION/$HOSTTYPE"
+        exec_on_node ${NODENAME}${i} "SUSEConnect -p sle-module-server-applications/$VERSION/$HOSTTYPE"
+        exec_on_node ${NODENAME}${i} "SUSEConnect -p sle-module-web-scripting/$VERSION/$HOSTTYPE"
+        exec_on_node ${NODENAME}${i} "SUSEConnect -p sle-module-development-tools/$VERSION/$HOSTTYPE"
+        exec_on_node ${NODENAME}${i} "SUSEConnect -p sle-module-hpc/$VERSION/$HOSTTYPE"
+    done
+}
+
+cleanup_zypper_repo() {
+echo $I "############ START cleanup_zypper_repo"$O
+    for i in `seq 1 $NBNODE`
+    do
+        exec_on_node ${NODENAME}${i} "SUSEConnect --cleanup"
+        exec_on_node ${NODENAME}${i} "zypper removerepo 1 2 3 4 5 6 7 8 9"
+    done
+}
+
+update_nodes() {
+echo $I "############ START update_nodes"$O
+    for i in `seq 1 $NBNODE`
+    do
+#       exec_on_node ${NODENAME}${i} "zypper ref"
+        echo "AA"
+    done
+    for i in `seq 1 $NBNODE`
+    do
+        echo ${NODENAME}${i} "zypper up -y; zypper up -y --auto-agree-with-licenses"
+        exec_on_node_screen ${NODENAME}${i} "zypper ref -y ; zypper up -y --auto-agree-with-licenses"
+    done
+    echo " - Update running in background, check in screen:"
+    screen -list
+    echo " screen -r SCREENID"
+}
+

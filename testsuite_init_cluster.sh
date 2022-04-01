@@ -43,55 +43,6 @@ copy_ssh_key_on_nodes() {
     done
 }
 
-enable_DVD_media() {
-echo $I "############ START enable_DVD_media"$O
-    for i in `seq 1 $NBNODE`
-    do
-	exec_on_node ${NODENAME}${i} "zypper mr -e 1 2 3 4 5 6 7"
-    done
-}
-
-enable_SCC_repo() {
-echo $I "############ START enable_SCC_repo"$O
-    for i in `seq 1 $NBNODE`
-    do
-	exec_on_node ${NODENAME}${i} "SUSEConnect -r ${SCCREGCODE}"
-	exec_on_node ${NODENAME}${i} "SUSEConnect -p PackageHub/$VERSION/$HOSTTYPE"
-	exec_on_node ${NODENAME}${i} "SUSEConnect -p sle-module-server-applications/$VERSION/$HOSTTYPE"
-	exec_on_node ${NODENAME}${i} "SUSEConnect -p sle-module-web-scripting/$VERSION/$HOSTTYPE"
-	exec_on_node ${NODENAME}${i} "SUSEConnect -p sle-module-development-tools/$VERSION/$HOSTTYPE"
-	exec_on_node ${NODENAME}${i} "SUSEConnect -p sle-module-hpc/$VERSION/$HOSTTYPE"
-    done
-}
-
-cleanup_zypper_repo() {
-echo $I "############ START cleanup_zypper_repo"$O
-    for i in `seq 1 $NBNODE`
-    do
-	exec_on_node ${NODENAME}${i} "SUSEConnect --cleanup"
-	exec_on_node ${NODENAME}${i} "zypper removerepo 1 2 3 4 5 6 7 8 9"
-    done
-}
-
-
-update_nodes() {
-echo $I "############ START update_nodes"$O
-    for i in `seq 1 $NBNODE`
-    do
-#	exec_on_node ${NODENAME}${i} "zypper ref"
-	echo "AA"
-    done
-    for i in `seq 1 $NBNODE`
-    do
-        echo ${NODENAME}${i} "zypper up -y; zypper up -y --auto-agree-with-licenses"
-   	exec_on_node_screen ${NODENAME}${i} "zypper ref -y ; zypper up -y --auto-agree-with-licenses"
-    done
-    echo " - Update running in background, check in screen:"
-    screen -list
-    echo " screen -r SCREENID"
-}
-
-
 ganglia_web() {
     echo $I "############ START ganglia_web"
     echo "- Enable php7 and restart apache2" $O
@@ -258,6 +209,15 @@ case "$1" in
     sshkeynode)
 	copy_ssh_key_on_nodes
 	;;
+    media)
+	enable_DVD_media
+	;;
+    scc)
+        enable_SCC_repo
+        ;;
+    cleanrepo)
+        cleanup_zypper_repo
+        ;;
     munge)
 	munge_key
 	;;
@@ -270,32 +230,11 @@ case "$1" in
     ganglia)
 	ganglia_web
 	;;
-    media)
-	enable_DVD_media
-	;;
-    scc)
-	enable_SCC_repo
-	;;
-    cleanrepo)
-	cleanup_zypper_repo
-	;;
-    update)
-    	update_nodes
-	;;
     nodeslist)
     	scp_nodes_list
     	;;
     testuser)
 	create_test_user
-	;;
-    start)
-	start_vm
-	;;
-    stop)
-	stop_vm
-	;;
-    install)
-	install_package $2
 	;;
     all)
     	fix_hostname
@@ -339,12 +278,6 @@ Usage: $0
     configure apache and get ganglia up
     (no more supported starting from SLE15SP4)
 
- start
-    start all nodes
-
- stop 
-    stop all nodes
-
  nodeslist
     copy the full nodes list to all nodes in /etc/nodes file
 
@@ -353,9 +286,6 @@ Usage: $0
 
  testuser
     create a test user (you need to install slurm before!)
-
- install
-    install package name (or list)
 
  all 
     run all in this order
