@@ -13,12 +13,6 @@ else
     echo "! functions file needed! ; Exiting"
     exit 1
 fi
-if [ -f "${PWD}/nodes_ressources" ] ; then
-    . ${PWD}/nodes_ressources
-else
-    echo "! functions file nodes_ressources needed! ; Exiting"
-    exit 1
-fi
 check_load_config_file other
 
 
@@ -35,15 +29,16 @@ spack_basic() {
     exec_on_node ${NODENAME}1 ". /usr/share/spack/setup-env.sh && spack info netcdf-cxx4"
     exec_on_node ${NODENAME}1 ". /usr/share/spack/setup-env.sh && spack versions mpich"
 }
-
+ 
 spack_install_package() {
     echo $I "############ START spack_install_package" $O
     echo "- Node ${NODENAME}1:"
     exec_on_node ${NODENAME}1 ". /usr/share/spack/setup-env.sh && spack install mpich@3.3.2 -romio -libxml2 -hydra -fortran"
-    exec_on_node ${NODENAME}1 ". /usr/share/spack/setup-env.sh && spack install gcc@10.2.0"
-    exec_on_node ${NODENAME}1 ". /usr/share/spack/setup-env.sh && module load gcc-10.2.0"
-    exec_on_node ${NODENAME}1 ". /usr/share/spack/setup-env.sh && gcc --version"
-    exec_on_node ${NODENAME}1 ". /usr/share/spack/setup-env.sh && spack compiler find"
+    exec_on_node ${NODENAME}1 ". /usr/share/spack/setup-env.sh && spack load mpich@3.3.2 && mpicc -v"
+#    exec_on_node ${NODENAME}1 ". /usr/share/spack/setup-env.sh && spack install gcc@10.2.0"
+#    exec_on_node ${NODENAME}1 ". /usr/share/spack/setup-env.sh && module load gcc-10.2.0"
+#    exec_on_node ${NODENAME}1 ". /usr/share/spack/setup-env.sh && gcc --version"
+#    exec_on_node ${NODENAME}1 ". /usr/share/spack/setup-env.sh && spack compiler find"
 }
 
 spack_find() {
