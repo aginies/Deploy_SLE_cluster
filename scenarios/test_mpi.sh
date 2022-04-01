@@ -29,6 +29,14 @@ EOF"
     exec_on_node mpitest@${NODENAME}1 "cd /export && sh /export/build_prepare_mpi.sh"
 }
 
+install_mpi() {
+	echo $I "############ START install_mpi" $O
+	for i in `seq 1 $NBNODE`
+	do
+	  exec_on_node ${NODENAME}${i} "zypper in -y openmpi4-gnu-hpc-devel lua-lmod"
+        done
+}
+
 nfs_server() {
     echo $I "############ START nfs_server" $O
     exec_on_node ${NODENAME}1 "zypper in -y nfs-utils"
@@ -171,6 +179,9 @@ case $1 in
     mount)
 	mount_export
 	;;
+    install)
+	install_mpi
+        ;;
     umount)
 	umount_export
 	;;
@@ -199,6 +210,9 @@ usage of $0
 
  nclient
 	isntall nfs-utils, create /export on all nodes and mount /export from ${NODENAME}1
+
+install
+	install mpi
 
  usermpi
 	create an mpitest usr on all nodes (will used /export)
