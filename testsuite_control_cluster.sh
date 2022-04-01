@@ -26,6 +26,17 @@ slurm_down_up() {
 	exec_on_node ${NODENAME}1 "sinfo"
 }
 
+cmd_on_nodes() {
+    echo $I "############ START cmd" $O
+    if [ -z "$*" ]; then echo "- First arg must be the command!"; exit 1; fi
+    CMD="$*"
+    for i in `seq 1 $NBNODE`
+    do
+        exec_on_node ${NODENAME}${i} "$CMD"
+    done
+}
+
+
 #scontrol show job
 #scontrol show partition
 
@@ -54,6 +65,9 @@ case "$1" in
         ;;
     stop)
         stop_vm
+        ;;
+    cmd)
+	cmd_on_nodes $2
         ;;
     install)
         install_package $2
