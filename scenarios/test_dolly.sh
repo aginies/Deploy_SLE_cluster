@@ -27,22 +27,33 @@ diskname="disk"
 CLUSTERDUP="DUP"
 TESTDIR="/mnt/test"
 # size of the image to duplicate (in MB)
-SIZEM="15120"
+SIZEM="5120"
 
 # BIG CLUSTER CONFIG !
 NBNODE=4
 IMAGENB=${NBNODE}
 
-dolly_repo() {
+dolly_add_repo() {
     echo $I "############ START dolly_repo" $O
     for i in `seq 1 $NBNODE`
     do
         echo "- Node ${NODENAME}${i}:"
-	#SLE_15_SP3
-        exec_on_node_screen ${NODENAME}${i} "zypper addrepo https://download.opensuse.org/repositories/network:/cluster/SLE_${SLERELEASE}_${SPVERSION} dolly"
+	#ONLY AVAILABLE ON SLE_15_SP3 currently
+        #exec_on_node_screen ${NODENAME}${i} "zypper addrepo https://download.opensuse.org/repositories/network:/cluster/SLE_${SLERELEASE}_${SPVERSION} dolly"
+        exec_on_node ${NODENAME}${i} "zypper addrepo https://download.opensuse.org/repositories/network:/cluster/SLE_${SLERELEASE}_SP3 dolly"
+        exec_on_node ${NODENAME}${i} "zypper --gpg-auto-import-keys ref dolly"
     done
-
 }
+
+dolly_remove_repo() {
+    echo $I "############ START dolly_remove_repo" $O
+    for i in `seq 1 $NBNODE`
+    do
+        echo "- Node ${NODENAME}${i}:"
+        exec_on_node ${NODENAME}${i} "zypper removerepo dolly"
+    done
+}
+
 
 install_dolly() {
     echo $I "############ START install_dolly" $O
@@ -50,7 +61,7 @@ install_dolly() {
     for i in `seq 1 $NBNODE`
     do
 	echo "- Node ${NODENAME}${i}:"
-	exec_on_node_screen ${NODENAME}${i} "zypper in -y dolly"
+	exec_on_node ${NODENAME}${i} "zypper in -y --allow-vendor-change dolly"
     done
 }
 
@@ -206,6 +217,12 @@ echo $O
 echo
 
 case $1 in
+    repo)
+	dolly_add_repo
+	;;
+    removerepo)
+	dolly_remove_repo
+	;;
     install)
 	install_dolly
 	;;
@@ -284,6 +301,12 @@ INFO : Default root pass on Alpine VM is empty
 ################################################
 
 usage of $0 
+
+ repo
+	add network:cluster dolly repo (to test latest version)
+ 
+ removerepo
+ 	remove dolly repo
 
  install (not mandatory)
 	install dolly on all nodes
