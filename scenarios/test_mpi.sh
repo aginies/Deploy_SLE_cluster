@@ -191,7 +191,7 @@ case $1 in
     runmpi)
 	run_mpi
 	;;
-    back)
+    restore)
 	back_to_start
 	;;
     all)
