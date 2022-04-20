@@ -154,6 +154,7 @@ case "$1" in
 	# Use a minimal installation without X for node2 and node3 etc...
 	EXTRAARGS="autoyast=device://vdc/vm2.xml"
 	
+	sleep 1
 	for nb in `seq 2 $NBNODE` 
 	do
 	    # Install VM
@@ -170,6 +171,7 @@ case "$1" in
 		read
 	    fi
 	    install_vm ${MAC}
+	    sleep 1
 	done
 	;;
     addvm)
